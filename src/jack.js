@@ -151,10 +151,8 @@
 			var ex = {};
 			ex.times = 0;
 			ex.mock = mock;
-			ex.once = function() {
-				ex.times = 1;
-				return ex;
-			}
+			ex.once = function() { ex.times = 1; return ex; }
+			ex.exactly = function(n) { ex.times = n; return ex; }
 			expectations.push(ex);
 			return ex;
 		}

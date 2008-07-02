@@ -8,6 +8,11 @@ FEATURES:
 
 * Support specifying argument lists in expectations
 * Support specifying number of expected calls
+    - exactly(n)
+	- once()
+	- never()
+	- atLeast(n)
+	- atMost(n)
 * Support specifying a return object directly
     - example: ooo.returnValue(myValue)
     - instead of: ooo.mock(function(){return myValue})
