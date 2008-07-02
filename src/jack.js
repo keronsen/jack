@@ -114,9 +114,9 @@
 		function handleInvocation() {
 			invocations.push("");
 			if(mockImplementation == null) {
-				grabbedFunction.apply(null,arguments);
+				grabbedFunction.apply(this,arguments);
 			} else {
-				mockImplementation.apply(null,arguments);	
+				mockImplementation.apply(this,arguments);	
 			}
 		}
 		function reset() {

@@ -59,6 +59,23 @@
 			delete globalTestFunction;
 		}
 		,
+		'Should call grabbed functions with same this reference': function() {
+			var expectedThis = "This is this!";
+			var calledThis = null;
+			globalTestFunction = function(p1, p2) {
+				calledThis = this;
+			}
+			
+			jack(function(){
+				jack.grab("globalTestFunction");
+				globalTestFunction.call(expectedThis);
+			});
+			
+			value_of(calledThis).should_be(expectedThis);
+			
+			delete globalTestFunction;
+		}
+		,
 		'Should reset global functions when finished': function() {
 			var realFunctionHasBeenRun = false;
 			globalTestFunction = function() {}
@@ -243,6 +260,25 @@
 			
 			value_of(calledParameter1).should_be("value1");
 			value_of(calledParameter2).should_be("value2");
+
+			delete jQuery;
+		}
+		,
+		'Should call mock implementations with same this reference': function() {
+			var expectedThis = "This is this!";
+			var calledThis = null;
+			jQuery = { 
+				ajax:function(){}
+			}
+			
+			jack(function(){
+				jack.grab("jQuery.ajax").mock(function(){
+					calledThis = this;
+				});
+				jQuery.ajax.call(expectedThis);
+			});
+			
+			value_of(calledThis).should_be(expectedThis);
 
 			delete jQuery;
 		}
