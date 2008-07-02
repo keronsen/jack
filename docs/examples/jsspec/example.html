@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<title>JSSpec results</title>
+<link rel="stylesheet" type="text/css" href="lib/JSSpec.css" />
+<script type="text/javascript" src="lib/diff_match_patch.js"></script>
+<script type="text/javascript" src="lib/JSSpec.js"></script>
+
+<script type="text/javascript" src="../../../src/jack.js"></script>
+<script type="text/javascript">// <![CDATA[
+
+
+	function myGlobalFunction() {
+		return "This is myGlobalFunction()";
+	}
+	
+	myGlobalObject = {}
+	myGlobalObject.functionOne = function() {
+		return "This is myGlobalObject.functionOne()";
+	}
+
+	describe('Examples of successful expectations', {
+		'Expected function is called': function() {
+			jack(function(){
+				jack.grab("myGlobalFunction");
+				jack.expect("myGlobalFunction");
+				myGlobalFunction();
+			});
+		}
+		,
+		'Expected function is called on object': function() {
+			jack(function(){
+				jack.grab("myGlobalObject.functionOne");
+				jack.expect("myGlobalObject.functionOne");
+				myGlobalObject.functionOne();
+			});
+		}
+	});
+
+	describe('Examples of failing expectations', {
+		'Expected function not called': function() {
+			jack(function(){
+				jack.grab("myGlobalFunction");
+				jack.expect("myGlobalFunction");
+			});
+		}
+		,
+		'Expected function not called on object': function() {
+			jack(function(){
+				jack.grab("myGlobalObject.functionOne");
+				jack.expect("myGlobalObject.functionOne");
+			});
+		}
+	});
+	
+	describe('Examples of mock implementations', {
+		'Replace a function with a mock implementation': function() {
+			jack(function(){
+				jack.grab("myGlobalFunction");
+				jack.expect("myGlobalFunction").mock(function(){
+					return "This is a mock implementation";
+				});
+				value_of(myGlobalFunction()).should_be("This is a mock implementation");
+			});
+		}
+		,
+		'Replace a function on object with a mock implementation': function() {
+			jack(function(){
+				jack.grab("myGlobalObject.functionOne");
+				jack.expect("myGlobalObject.functionOne").mock(function(){
+					return "This is a mock implementation";
+				});
+				value_of(myGlobalObject.functionOne()).should_be("This is a mock implementation");
+			});
+		}
+	});
+	
+// ]]></script>
+</head>
+<body><div style="display:none;"><p>A</p><p>B</p></div></body>
+</html>

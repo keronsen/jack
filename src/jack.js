@@ -135,7 +135,7 @@
 			if(mockImplementation == null) {
 				grabbedFunction.apply(this,arguments);
 			} else {
-				mockImplementation.apply(this,arguments);	
+				return mockImplementation.apply(this,arguments);	
 			}
 		}
 		function reset() {
@@ -210,7 +210,8 @@
 		return {
 			'isJSSpec': isJSSpec,
 			'report': report,
-			'disableReporting': function() { reportingEnabled = false; }
+			'disableReporting': function() { reportingEnabled = false; },
+			'enableReporting': function() { reportingEnabled = true; }
 		}
 		function init() {
 			
