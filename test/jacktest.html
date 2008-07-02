@@ -11,6 +11,10 @@
 <script type="text/javascript">// <![CDATA[
 
 	describe('Jack API', {
+		before_all: function() {
+			jack.env.disableReporting();
+		}
+		,
 		'Should have a global jack() function': function() {
 			value_of(typeof jack).should_be("function");
 		}
@@ -182,28 +186,39 @@
 				jack.grab("functionOne");
 				jack.grab("functionTwo");
 				jack.expect("functionOne");
+				functionOne();
 				functionTwo();
 				functionTwo();
 			});
 			
 			value_of(jack.report("bowlingGame.roll")).should_be({
 				expected: 1,
-				actual: 0
+				actual: 0,
+				success: false,
+				fail: true
 			});
 			value_of(jack.report("bowlingGame.score")).should_be({
 				expected: 0,
-				actual: 1
+				actual: 1,
+				success: false,
+				fail: true
 			});
 			value_of(jack.report("functionOne")).should_be({
 				expected: 1,
-				actual: 0
+				actual: 1,
+				success: true,
+				fail: false
 			});
 			value_of(jack.report("functionTwo")).should_be({
 				expected: 0,
-				actual: 2
+				actual: 2,
+				success: false,
+				fail: true
 			});
 			
 			delete bowlingGame;
+			delete functionOne;
+			delete functionTwo;
 		}
 		,
 		'Should start fresh when jack() is called a second time': function() {
@@ -285,13 +300,47 @@
 	})
 	
 	
-	/*
-	describe('Integration with JSSpec (NOT IMPLEMENTED)',{
+	
+	describe('JSSpec integration',{
+		'Should know when JSSpec is in environment': function() {
+			value_of(jack.env.isJSSpec()).should_be_true();
+		}
+		,
+		'Should know when JSSpec not is in environment': function() {
+			var _jsspec = window.JSSpec;
+			window.JSSpec = null;
+			var result = jack.env.isJSSpec();
+			window.JSSpec = _jsspec;
+			value_of(result).should_be_false();
+		}
+		,
+		'Should report unmet expectations to value_of().should_fail()': function() {
+			var failMessage = "";
+			var _valueof = value_of;
+			value_of = function() {
+				return {
+					should_fail: function(msg) {
+						failMessage = msg;
+					}
+				}
+			}
+			
+			globalFunction = function() {};
+			jack(function(){
+				jack.grab("globalFunction");
+				jack.expect("globalFunction").once();
+			});
+			
+			value_of = _valueof;
+			value_of(failMessage).should_be("Expectation failed: globalFunction() was expected 1 time(s), but was called 0 time(s).");
+			
+			delete globalFunction;
+		}
 	});
 
 
 
-
+	/*
 	describe('Integration with Scriptaculous testrunner (NOT IMPLEMENTED)',{
 	});
 

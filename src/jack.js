@@ -10,6 +10,8 @@
 	 */
 	function Jack() {
 		var grabs = {};
+		var environment = new Environment();
+		var reportMessage = "Expectation failed: {name}() was expected {expected} time(s), but was called {actual} time(s).";
 		init();
 		return createPublicApi();
 		
@@ -22,14 +24,31 @@
 			api.examine = examine;
 			api.expect = expect;
 			api.report = report;
+			api.env = environment;
 			return api;
 		}
 		function jackFunction(func) {
 			grabs = {};
 			func();
+			reportToEnvironment();
 			resetGrabs();
 		}
-		
+		function reportToEnvironment() {
+			for(var name in grabs) {
+				if(grabs[name].report) {
+					var report = grabs[name].report();
+					if(report.fail) {
+						environment.report(generateReportMessage(name,report));
+					}
+				}
+			}
+		}
+		function generateReportMessage(grabName,report) {
+			return reportMessage
+					.replace("{name}",grabName)
+					.replace("{expected}",report.expected)
+					.replace("{actual}",report.actual);
+		}
 		function grab(name) {
 			var grabbed = null;
 			eval("grabbed = " + name);
@@ -137,10 +156,14 @@
 			return ex;
 		}
 		function report() {
-			var report = { expected:0, actual: 0 };
+			var report = { expected:0, actual: 0, success:true, fail:false };
 			report.actual = invocations.length;
 			if(expectations.length>0) {
 				report.expected = expectations[0].times;
+			}
+			if(report.actual != report.expected) {
+				report.fail = true;
+				report.success = false;
 			}
 			return report;
 		}
@@ -173,6 +196,32 @@
 		function reset() {
 			for(var g in grabs) {
 				grabs[g].reset();
+			}
+		}
+	}
+	
+	
+	/**
+	 *
+	 */
+	function Environment() {
+		var reportingEnabled = true;
+		init();
+		return {
+			'isJSSpec': isJSSpec,
+			'report': report,
+			'disableReporting': function() { reportingEnabled = false; }
+		}
+		function init() {
+			
+		}
+		function isJSSpec() {
+			return window.JSSpec != null;
+		}
+		function report(message) {
+			if(!reportingEnabled) { return; }
+			if(isJSSpec()) {
+				value_of("").should_fail(message);
 			}
 		}
 	}
