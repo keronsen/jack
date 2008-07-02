@@ -1,3 +1,11 @@
+/**
+ *
+ *  JACK :: JavaScript Mocking.
+ *  Version: $Id$
+ *
+ */
+
+
 
 (function (){ // START HIDING FROM GLOBAL SCOPE
 	/** EXPORT JACK **/
