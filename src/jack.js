@@ -80,6 +80,9 @@
 			return findGrab(name);
 		}
 		function expect(name) {
+			if(grabs[name]==null) {
+				grab(name);
+			}
 			return findGrab(name).expect().once();
 		}
 		function report(name) {

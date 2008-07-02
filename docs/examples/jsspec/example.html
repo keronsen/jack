@@ -23,7 +23,6 @@
 	describe('Examples of successful expectations', {
 		'Expected function is called': function() {
 			jack(function(){
-				jack.grab("myGlobalFunction");
 				jack.expect("myGlobalFunction");
 				myGlobalFunction();
 			});
@@ -31,7 +30,6 @@
 		,
 		'Expected function is called on object': function() {
 			jack(function(){
-				jack.grab("myGlobalObject.functionOne");
 				jack.expect("myGlobalObject.functionOne");
 				myGlobalObject.functionOne();
 			});
@@ -41,14 +39,12 @@
 	describe('Examples of failing expectations', {
 		'Expected function not called': function() {
 			jack(function(){
-				jack.grab("myGlobalFunction");
 				jack.expect("myGlobalFunction");
 			});
 		}
 		,
 		'Expected function not called on object': function() {
 			jack(function(){
-				jack.grab("myGlobalObject.functionOne");
 				jack.expect("myGlobalObject.functionOne");
 			});
 		}
@@ -57,7 +53,6 @@
 	describe('Examples of mock implementations', {
 		'Replace a function with a mock implementation': function() {
 			jack(function(){
-				jack.grab("myGlobalFunction");
 				jack.expect("myGlobalFunction").mock(function(){
 					return "This is a mock implementation";
 				});
@@ -67,7 +62,6 @@
 		,
 		'Replace a function on object with a mock implementation': function() {
 			jack(function(){
-				jack.grab("myGlobalObject.functionOne");
 				jack.expect("myGlobalObject.functionOne").mock(function(){
 					return "This is a mock implementation";
 				});

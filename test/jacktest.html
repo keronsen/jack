@@ -305,7 +305,23 @@
 
 			delete jQuery;
 		}
+		,
+		'Should not have to call grab() before expect()': function() {
+			globalFunction = function() {}
+			
+			jack(function(){
+				jack.expect("globalFunction");
+			});
+			
+			var report = jack.report("globalFunction");
+			value_of(report.expected).should_be(1);
+			
+			delete globalFunction;
+		}
 	})
+	
+	
+	
 	
 	
 	

@@ -12,7 +12,7 @@ FEATURES:
     - example: ooo.returnValue(myValue)
     - instead of: ooo.mock(function(){return myValue})
 * Support grabbing deeper objects. Currently only one level.
-* 
+* Integration with Scriptaculous test runner
 
 
 DONE:
