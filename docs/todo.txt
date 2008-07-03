@@ -1,7 +1,7 @@
 
 BUGS:
 
-
+* IE reports failed expectations multiple times
 
 
 FEATURES: 
@@ -18,6 +18,7 @@ FEATURES:
     - instead of: ooo.mock(function(){return myValue})
 * Support grabbing deeper objects. Currently only one level.
 * Integration with Scriptaculous test runner
+* Report line numbers for failed expectations (may not be possible)
 
 
 DONE:

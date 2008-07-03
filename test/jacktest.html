@@ -33,7 +33,7 @@
 		,
 		'Should be able to grab a global function and know if it has been run': function() {
 			var realFunctionHasBeenRun = false;
-			globalTestFunction = function() {
+			window.globalTestFunction = function() {
 				realFunctionHasBeenRun = true;
 			}
 			
@@ -45,13 +45,13 @@
 			value_of(realFunctionHasBeenRun).should_be_true();
 			value_of(jack.examine("globalTestFunction").times()).should_be(1);
 			
-			delete globalTestFunction;
+			window.globalTestFunction = null;
 		}
 		,
 		'Should call grabbed functions with same arguments': function() {
 			var calledParameter1 = "";
 			var calledParameter2 = "";
-			globalTestFunction = function(p1, p2) {
+			window.globalTestFunction = function(p1, p2) {
 				calledParameter1 = p1;
 				calledParameter2 = p2;
 			}
@@ -64,13 +64,13 @@
 			value_of(calledParameter1).should_be("value1");
 			value_of(calledParameter2).should_be("value2");
 			
-			delete globalTestFunction;
+			window.globalTestFunction = null;
 		}
 		,
 		'Should call grabbed functions with same this reference': function() {
 			var expectedThis = "This is this!";
 			var calledThis = null;
-			globalTestFunction = function(p1, p2) {
+			window.globalTestFunction = function(p1, p2) {
 				calledThis = this;
 			}
 			
@@ -81,12 +81,12 @@
 			
 			value_of(calledThis).should_be(expectedThis);
 			
-			delete globalTestFunction;
+			window.globalTestFunction = null;
 		}
 		,
 		'Should reset global functions when finished': function() {
 			var realFunctionHasBeenRun = false;
-			globalTestFunction = function() {}
+			window.globalTestFunction = function() {}
 			var referenceToGlobalTestFunction = globalTestFunction;
 			
 			jack(function(){
@@ -97,17 +97,17 @@
 			
 			value_of(globalTestFunction === referenceToGlobalTestFunction).should_be_true();
 			
-			delete globalTestFunction;
+			window.globalTestFunction = null;
 		}
 		,
 		'Should be able to grab all of an objects functions': function() {
 			var realFunctionOneHasBeenRun = false;
 			var realFunctionTwoHasBeenRun = false;
 			var realFunctionThreeHasBeenRun = false;
-			globalObject = {};
-			globalObject.functionOne = function() { realFunctionOneHasBeenRun = true; }
-			globalObject.functionTwo = function() { realFunctionTwoHasBeenRun = true; }
-			globalObject.functionThree = function() { realFunctionThreeHasBeenRun = true; }
+			window.globalObject = {};
+			window.globalObject.functionOne = function() { realFunctionOneHasBeenRun = true; }
+			window.globalObject.functionTwo = function() { realFunctionTwoHasBeenRun = true; }
+			window.globalObject.functionThree = function() { realFunctionThreeHasBeenRun = true; }
 			
 			jack(function(){
 				jack.grab("globalObject");
@@ -123,14 +123,14 @@
 			value_of(jack.examine("globalObject.functionTwo").times()).should_be(2);
 			value_of(jack.examine("globalObject.functionThree").times()).should_be(0);
 			
-			delete globalObject;
+			window.globalObject = null;
 		}
 		,
 		'Should reset global objects function when finished': function() {
-			globalObject = {};
-			globalObject.functionOne = function() {}
-			globalObject.functionTwo = function() {}
-			globalObject.functionThree = function() {}
+			window.globalObject = {};
+			window.globalObject.functionOne = function() {}
+			window.globalObject.functionTwo = function() {}
+			window.globalObject.functionThree = function() {}
 			var functionOneReference = globalObject.functionOne;
 			var functionTwoReference = globalObject.functionTwo;
 			var functionThreeReference = globalObject.functionThree;
@@ -149,17 +149,17 @@
 			value_of(globalObject.functionTwo === functionTwoReference).should_be_true();
 			value_of(globalObject.functionThree === functionThreeReference).should_be_true();
 			
-			delete globalObject;
+			window.globalObject = null;
 		}
 		,
 		'Should be able to grab one of an objects functions': function() {
 			var realFunctionOneHasBeenRun = false;
 			var realFunctionTwoHasBeenRun = false;
 			var realFunctionThreeHasBeenRun = false;
-			globalObject = {};
-			globalObject.functionOne = function() { realFunctionOneHasBeenRun = true; }
-			globalObject.functionTwo = function() { realFunctionTwoHasBeenRun = true; }
-			globalObject.functionThree = function() { realFunctionThreeHasBeenRun = true; }
+			window.globalObject = {};
+			window.globalObject.functionOne = function() { realFunctionOneHasBeenRun = true; }
+			window.globalObject.functionTwo = function() { realFunctionTwoHasBeenRun = true; }
+			window.globalObject.functionThree = function() { realFunctionThreeHasBeenRun = true; }
 			
 			jack(function(){
 				jack.grab("globalObject.functionTwo");
@@ -174,13 +174,13 @@
 			value_of(jack.examine("globalObject.functionThree")).should_be_undefined();
 			value_of(jack.examine("globalObject.functionOne")).should_be_undefined();
 			
-			delete globalObject;
+			window.globalObject = null;
 		}
 		,
 		'Should report how well expectations are met': function() {			
-			bowlingGame = { roll:function(){}, score:function(){} };
-			functionOne = function() {}
-			functionTwo = function() {}
+			window.bowlingGame = { roll:function(){}, score:function(){} };
+			window.functionOne = function() {}
+			window.functionTwo = function() {}
 			
 			jack(function(){
 				jack.grab("bowlingGame");
@@ -220,13 +220,13 @@
 				fail: true
 			});
 			
-			delete bowlingGame;
-			delete functionOne;
-			delete functionTwo;
+			window.bowlingGame = null;
+			window.functionOne = null;
+			window.functionTwo = null;
 		}
 		,
 		'Should start fresh when jack() is called a second time': function() {
-			globalTestFunction = function() { }
+			window.globalTestFunction = function() { }
 			
 			jack(function(){
 				jack.grab("globalTestFunction");
@@ -239,7 +239,7 @@
 			});
 			value_of(jack.examine("globalTestFunction")).should_be_undefined();
 			
-			delete globalTestFunction;
+			window.globalTestFunction = null;
 		}
 		,
 		'Should be able to specify mock implementations': function() {
@@ -247,7 +247,7 @@
 			var mockJQueryAjaxCalled = false;
 			var expectedReturnValue = "Return value";
 			var actualReturnValue = "";
-			jQuery = { 
+			window.jQuery = { 
 				ajax:function(){ realJQueryAjaxCalled = true; }
 			}
 			
@@ -263,13 +263,13 @@
 			value_of(mockJQueryAjaxCalled).should_be_true();
 			value_of(actualReturnValue).should_be(expectedReturnValue);
 			
-			delete jQuery;
+			window.jQuery = null;
 		}
 		,
 		'Should call mock implementations with same arguments': function() {
 			var calledParameter1 = "";
 			var calledParameter2 = "";
-			jQuery = { 
+			window.jQuery = { 
 				ajax:function(p1, p2){}
 			}
 			
@@ -284,13 +284,13 @@
 			value_of(calledParameter1).should_be("value1");
 			value_of(calledParameter2).should_be("value2");
 
-			delete jQuery;
+			window.jQuery = null;
 		}
 		,
 		'Should call mock implementations with same this reference': function() {
 			var expectedThis = "This is this!";
 			var calledThis = null;
-			jQuery = { 
+			window.jQuery = { 
 				ajax:function(){}
 			}
 			
@@ -303,11 +303,11 @@
 			
 			value_of(calledThis).should_be(expectedThis);
 
-			delete jQuery;
+			window.jQuery = null;
 		}
 		,
 		'Should not have to call grab() before expect()': function() {
-			globalFunction = function() {}
+			window.globalFunction = function() {}
 			
 			jack(function(){
 				jack.expect("globalFunction");
@@ -316,7 +316,7 @@
 			var report = jack.report("globalFunction");
 			value_of(report.expected).should_be(1);
 			
-			delete globalFunction;
+			window.globalFunction = null;
 		}		
 	});
 	
@@ -332,7 +332,7 @@
 		}
 		,
 		'Should be able to specify exact number of expected calls as a digit': function() {
-			globalFunction = function() {}
+			window.globalFunction = function() {}
 			
 			jack(function(){
 				jack.expect("globalFunction").exactly(3);
@@ -341,11 +341,11 @@
 			var report = jack.report("globalFunction");
 			value_of(report.expected).should_be(3);
 			
-			delete globalFunction;
+			window.globalFunction = null;
 		}
 		,
 		'Should be able to specify exact number of expected calls with a string': function() {
-			globalFunction = function() {}
+			window.globalFunction = function() {}
 			
 			jack(function(){
 				jack.expect("globalFunction").exactly("3 times");
@@ -354,7 +354,7 @@
 			var report = jack.report("globalFunction");
 			value_of(report.expected).should_be(3);
 			
-			delete globalFunction;
+			window.globalFunction = null;
 		}
 	});
 	
@@ -372,27 +372,51 @@
 			value_of(result).should_be_false();
 		}
 		,
-		'Should report unmet expectations to value_of().should_fail()': function() {
-			var failMessage = "";
-			var _valueof = value_of;
-			value_of = function() {
-				return {
-					should_fail: function(msg) {
-						failMessage = msg;
-					}
-				}
+		'Should report unmet expectations by throwing an exeption and storing it for JSSpec (NORMAL BROWSERS) [[!JSSpec.Browser.Trident]]': function() {
+			var actualException = null;
+			var actualAssertionFailure = null;
+			try {
+				window.globalFunction = function() {};
+				jack(function(){
+					jack.grab("globalFunction");
+					jack.expect("globalFunction").once();
+				});
+			} catch(ex) {
+				actualException = ex;
+				actualAssertionFailure = JSSpec._assertionFailure;
+				delete JSSpec._assertionFailure;
 			}
 			
-			globalFunction = function() {};
+			var expectedObject = {message:"Expectation failed: globalFunction() was expected 1 time(s), but was called 0 time(s)."};
+			value_of(actualException).should_be(expectedObject);
+			value_of(actualAssertionFailure).should_be(expectedObject);
+			
+			window.globalFunction = null;
+		}
+		,
+		'Should report unmet expectations by throwing an exeption and storing it for JSSpec (INTERNET EXPLORER) [[JSSpec.Browser.Trident]]': function() {
+			window.globalFunction = function() {};
+			var calledWithExecutor;
+			var calledWithException;
+			var storedOnException = this.onException;
+			this.onException = function(executor,exception) {
+				calledWithExecutor = executor;
+				calledWithException = exception;
+			}
 			jack(function(){
 				jack.grab("globalFunction");
 				jack.expect("globalFunction").once();
 			});
+			this.onException = storedOnException;
+			var actualAssertionFailure = JSSpec._assertionFailure;
+			JSSpec._assertionFailure = null;
 			
-			value_of = _valueof;
-			value_of(failMessage).should_be("Expectation failed: globalFunction() was expected 1 time(s), but was called 0 time(s).");
+			var expectedObject = {message:"Expectation failed: globalFunction() was expected 1 time(s), but was called 0 time(s)."};
+			value_of(actualAssertionFailure).should_be(expectedObject);
+			value_of(calledWithException).should_be(expectedObject);
+			value_of(calledWithExecutor).should_be(this);
 			
-			delete globalFunction;
+			window.globalFunction = null;
 		}
 	});
 
