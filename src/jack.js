@@ -160,9 +160,19 @@
 			ex.times = 0;
 			ex.mock = mock;
 			ex.once = function() { ex.times = 1; return ex; }
-			ex.exactly = function(n) { ex.times = n; return ex; }
+			ex.exactly = function(n) { ex.times = parseTimes(n); return ex; }
 			expectations.push(ex);
 			return ex;
+		}
+		function parseTimes(expression) {
+			var result = 0;
+			if("number" == typeof expression) {
+				result = expression;
+			} else if("string" == typeof expression) {
+				var parts = expression.split(" ");
+				result = parseInt(parts[0]);
+			}
+			return result;
 		}
 		function report() {
 			var report = { expected:0, actual: 0, success:true, fail:false };
