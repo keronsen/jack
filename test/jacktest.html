@@ -43,7 +43,7 @@
 			});
 			
 			value_of(realFunctionHasBeenRun).should_be_true();
-			value_of(jack.examine("globalTestFunction").times()).should_be(1);
+			value_of(jack.inspect("globalTestFunction").times()).should_be(1);
 			
 			window.globalTestFunction = null;
 		}
@@ -119,9 +119,9 @@
 			value_of(realFunctionOneHasBeenRun).should_be_true();
 			value_of(realFunctionTwoHasBeenRun).should_be_true();
 			value_of(realFunctionThreeHasBeenRun).should_be_false();
-			value_of(jack.examine("globalObject.functionOne").times()).should_be(1);
-			value_of(jack.examine("globalObject.functionTwo").times()).should_be(2);
-			value_of(jack.examine("globalObject.functionThree").times()).should_be(0);
+			value_of(jack.inspect("globalObject.functionOne").times()).should_be(1);
+			value_of(jack.inspect("globalObject.functionTwo").times()).should_be(2);
+			value_of(jack.inspect("globalObject.functionThree").times()).should_be(0);
 			
 			window.globalObject = null;
 		}
@@ -170,9 +170,9 @@
 			value_of(realFunctionOneHasBeenRun).should_be_true();
 			value_of(realFunctionTwoHasBeenRun).should_be_true();
 			value_of(realFunctionThreeHasBeenRun).should_be_false();
-			value_of(jack.examine("globalObject.functionTwo").times()).should_be(1);
-			value_of(jack.examine("globalObject.functionThree")).should_be_undefined();
-			value_of(jack.examine("globalObject.functionOne")).should_be_undefined();
+			value_of(jack.inspect("globalObject.functionTwo").times()).should_be(1);
+			value_of(jack.inspect("globalObject.functionThree")).should_be_undefined();
+			value_of(jack.inspect("globalObject.functionOne")).should_be_undefined();
 			
 			window.globalObject = null;
 		}
@@ -232,12 +232,12 @@
 				jack.grab("globalTestFunction");
 				globalTestFunction();
 			});
-			value_of(jack.examine("globalTestFunction").times()).should_be(1);
+			value_of(jack.inspect("globalTestFunction").times()).should_be(1);
 			
 			jack(function(){
 				// do nothing
 			});
-			value_of(jack.examine("globalTestFunction")).should_be_undefined();
+			value_of(jack.inspect("globalTestFunction")).should_be_undefined();
 			
 			window.globalTestFunction = null;
 		}

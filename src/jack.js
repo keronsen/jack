@@ -30,7 +30,7 @@
 		function createPublicApi() {
 			var api = jackFunction;
 			api.grab = grab;
-			api.examine = examine;
+			api.inspect = inspect;
 			api.expect = expect;
 			api.report = report;
 			api.env = environment;
@@ -97,7 +97,7 @@
 			return grabs[name];
 		}
 		
-		function examine(name) {
+		function inspect(name) {
 			return findGrab(name);
 		}
 		function expect(name) {
