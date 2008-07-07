@@ -6,6 +6,7 @@ BUGS:
 
 FEATURES: 
 
+* Support saving argument values for inspection
 * Support specifying argument lists in expectations
 * Support specifying number of expected calls
     - exactly(n)
