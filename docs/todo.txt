@@ -6,7 +6,7 @@ BUGS:
 
 FEATURES: 
 
-* Support saving argument values for inspection
+* Support setting multiple expectations for a function (saving different argument values, etc.)
 * Support specifying argument lists in expectations
 * Support specifying number of expected calls
     - exactly(n)
@@ -25,3 +25,4 @@ FEATURES:
 DONE:
 
 * Integration with JsSpec
+* Support saving argument values for inspection

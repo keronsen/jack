@@ -141,14 +141,17 @@
 	function FunctionGrab(functionName, grabbedFunction, parentObject) {
 		var invocations = [];
 		var expectations = [];
-		var mockImplementation = null;
+		var mockImplementation;
+		var savedArguments;
+		
 		init();
 		return {
 			'times': function() { return invocations.length; },
 			'reset': reset,
 			'expect': expect,
 			'report': report,
-			'mock': mock
+			'mock': mock,
+			'arguments': arguments
 		};
 		
 		function init() {
@@ -156,6 +159,14 @@
 		}
 		function handleInvocation() {
 			invocations.push("");
+			var expectation = expectations[0];
+			if(expectation._saveArguments) {
+				savedArguments = arguments;
+				for(var i=0; i<expectation._saveArgumentNames.length; i++) {
+					var name = expectation._saveArgumentNames[i];
+					savedArguments[name] = savedArguments[i];
+				}
+			}
 			if(mockImplementation == null) {
 				grabbedFunction.apply(this,arguments);
 			} else {
@@ -170,10 +181,13 @@
 		}
 		function expect() {
 			var ex = {};
-			ex.times = 0;
+			ex._times = 0;
+			ex._saveArguments = false;
+			ex._saveArgumentNames = [];
 			ex.mock = mock;
-			ex.once = function() { ex.times = 1; return ex; }
-			ex.exactly = function(n) { ex.times = parseTimes(n); return ex; }
+			ex.once = function() { ex._times = 1; return ex; }
+			ex.exactly = function(n) { ex._times = parseTimes(n); return ex; }
+			ex.saveArguments = function() { ex._saveArguments = true; ex._saveArgumentNames = arguments; }
 			expectations.push(ex);
 			return ex;
 		}
@@ -191,13 +205,16 @@
 			var report = { expected:0, actual: 0, success:true, fail:false };
 			report.actual = invocations.length;
 			if(expectations.length>0) {
-				report.expected = expectations[0].times;
+				report.expected = expectations[0]._times;
 			}
 			if(report.actual != report.expected) {
 				report.fail = true;
 				report.success = false;
 			}
 			return report;
+		}
+		function arguments() {
+			return savedArguments;
 		}
 	} // END FunctionGrab()
 	
