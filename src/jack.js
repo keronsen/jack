@@ -160,7 +160,7 @@
 		function handleInvocation() {
 			invocations.push("");
 			var expectation = expectations[0];
-			if(expectation._saveArguments) {
+			if(expectation && expectation._saveArguments) {
 				savedArguments = arguments;
 				for(var i=0; i<expectation._saveArgumentNames.length; i++) {
 					var name = expectation._saveArgumentNames[i];
