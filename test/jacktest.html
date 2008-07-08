@@ -266,6 +266,31 @@
 			window.jQuery = null;
 		}
 		,
+		'Should clean up mock implementations': function() {
+			var realJQueryAjaxCalled = 0;
+			var mockJQueryAjaxCalled = 0;
+			window.jQuery = { 
+				ajax:function(){ realJQueryAjaxCalled++; }
+			}
+			
+			jack(function(){
+				jack.expect("jQuery.ajax").mock(function(){
+					mockJQueryAjaxCalled++;
+				});
+				jQuery.ajax();
+			});
+			
+			jack(function(){
+				jack.expect("jQuery.ajax");
+				jQuery.ajax();
+			});
+			
+			value_of(realJQueryAjaxCalled).should_be(1);
+			value_of(mockJQueryAjaxCalled).should_be(1);
+			
+			window.jQuery = null;
+		}
+		,
 		'Should call mock implementations with same arguments': function() {
 			var calledParameter1 = "";
 			var calledParameter2 = "";
