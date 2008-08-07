@@ -6,8 +6,10 @@ BUGS:
 
 FEATURES: 
 
+* Support specifying argument constraints in expectations
+	- type
+	- delegate constraints to function(arg) { return true/false; }
 * Support setting multiple expectations for a function (saving different argument values, etc.)
-* Support specifying argument lists in expectations
 * Support specifying number of expected calls
     - exactly(n)
 	- once()
@@ -24,5 +26,6 @@ FEATURES:
 
 DONE:
 
+* Simple argument equality constraints
 * Integration with JsSpec
 * Support saving argument values for inspection
