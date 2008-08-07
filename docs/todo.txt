@@ -11,11 +11,8 @@ FEATURES:
 	- delegate constraints to function(arg) { return true/false; }
 * Support setting multiple expectations for a function (saving different argument values, etc.)
 * Support specifying number of expected calls
-    - exactly(n)
-	- once()
 	- never()
-	- atLeast(n)
-	- atMost(n)
+
 * Support specifying a return object directly
     - example: ooo.returnValue(myValue)
     - instead of: ooo.mock(function(){return myValue})
@@ -29,3 +26,8 @@ DONE:
 * Simple argument equality constraints
 * Integration with JsSpec
 * Support saving argument values for inspection
+* Support specifying number of expected calls
+	- atLeast(n)
+	- atMost(n)
+    - exactly(n)
+	- once()

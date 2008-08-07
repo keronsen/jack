@@ -194,13 +194,16 @@
 		function expect() {
 			var ex = {};
 			ex._times = 0;
+			ex._timesModifier = 0;
 			ex._saveArguments = false;
 			ex._saveArgumentNames = [];
 			ex._argumentConstraints = null;
 			ex._argumentConstraintsMet = true;
 			ex.mock = mock;
-			ex.once = function() { ex._times = 1; return ex; }
+			ex.atLeast = function(n) { ex._times = parseTimes(n); ex._timesModifier = 1; return ex; }
+			ex.atMost  = function(n) { ex._times = parseTimes(n); ex._timesModifier = -1; return ex; }
 			ex.exactly = function(n) { ex._times = parseTimes(n); return ex; }
+			ex.once = function() { return ex.exactly(1) }
 			ex.saveArguments = function() { 
 				ex._saveArguments = true; 
 				ex._saveArgumentNames = arguments;
@@ -233,9 +236,21 @@
 				}
 			}
 			if(expectations.length>0) {
-				report.expected = expectations[0]._times;
-			}
-			if(report.actual != report.expected) {
+				var ex = expectations[0];
+				report.expected = ex._times;
+				if(ex._timesModifier == 0 && report.actual != report.expected) {
+					report.fail = true;
+					report.success = false;
+				}
+				if(ex._timesModifier > 0 && report.actual < report.expected) {
+					report.fail = true;
+					report.success = false;
+				}
+				if(ex._timesModifier < 0 && report.actual > report.expected) {
+					report.fail = true;
+					report.success = false;
+				}
+			} else if(report.actual != report.expected) {
 				report.fail = true;
 				report.success = false;
 			}
