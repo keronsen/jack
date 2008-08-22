@@ -610,7 +610,7 @@
 			jack.env.enableReporting();
 		}
 		,
-		'Should be able to specify argument contstraints: Equal': function() {
+		'Should be able to specify argument contstraints: Equal (Strings)': function() {
 			window.globalFunctionOne = function() {}
 			window.globalFunctionTwo = function() {}
 			
@@ -620,6 +620,29 @@
 				
 				window.globalFunctionOne("foo", "bar");
 				window.globalFunctionTwo("argValue1", "argValue2");
+			});
+			
+			var reportOne = jack.report("globalFunctionOne");
+			var reportTwo = jack.report("globalFunctionTwo");
+			value_of(reportOne.expected).should_be(1);
+			value_of(reportOne.actual).should_be(0);
+			value_of(reportTwo.expected).should_be(1);
+			value_of(reportTwo.actual).should_be(1);
+			
+			window.globalFunctionOne = null;
+			window.globalFunctionTwo = null;
+		}
+		,
+		'Should be able to specify argument contstraints: Equal (Numbers)': function() {
+			window.globalFunctionOne = function() {}
+			window.globalFunctionTwo = function() {}
+			
+			jack(function(){
+				jack.expect("globalFunctionOne").exactly("1 time").withArguments(1234,5678);
+				jack.expect("globalFunctionTwo").exactly("1 time").withArguments(1234,5678);
+				
+				window.globalFunctionOne(1111, 5555);
+				window.globalFunctionTwo(1234, 5678);
 			});
 			
 			var reportOne = jack.report("globalFunctionOne");
@@ -690,7 +713,30 @@
 	
 	
 	
+	describe('Text reports', {
+		before_all: function() {
+			jack.env.disableReporting();
+		}
+		,
+		after_all: function() {
+			jack.env.enableReporting();
+		}
+		,
+		'Report for number of calls (exact)': function() {
+			window.globalFunction = function() {};
+			
+			jack(function(){
+				jack.expect("globalFunction").exactly("1 time");
+			});
+			
+			// var reports = jack.getTextReports();
+			// debugger;
+			
+			window.globalFunction = null;
+		}
 	
+	
+	});
 	
 	
 	

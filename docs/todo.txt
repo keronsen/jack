@@ -6,6 +6,7 @@ BUGS:
 
 FEATURES: 
 
+* Text reporting for "at least", "at most" etc...
 * Support for mocking/stubbing any function or object with multiple function
 * Support specifying argument constraints in expectations
 	- type
