@@ -195,6 +195,8 @@
 			var arg = invocation.arguments;
 			if(constr == null) {
 				return true;
+			} else if(constr.length != arg.length) {
+				return false;
 			} else {
 				for(var i=0; i<constr.length; i++) {
 					if(constr[i] != arg[i]) {
@@ -235,6 +237,7 @@
 				ex._argumentConstraints = arguments;
 				return ex;
 			}
+			ex.withNoArguments = function() { ex.withArguments(); }
 			expectations.push(ex);
 			return ex;
 		}

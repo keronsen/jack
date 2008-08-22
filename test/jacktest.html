@@ -610,6 +610,29 @@
 			jack.env.enableReporting();
 		}
 		,
+		'Should be able to specify that no arguments are expected': function() {
+			window.globalFunctionOne = function() {}
+			window.globalFunctionTwo = function() {}
+			
+			jack(function(){
+				jack.expect("globalFunctionOne").exactly("1 time").withNoArguments();
+				jack.expect("globalFunctionTwo").exactly("1 time").withNoArguments();
+				
+				window.globalFunctionOne("foo", "bar");
+				window.globalFunctionTwo();
+			});
+			
+			var reportOne = jack.report("globalFunctionOne");
+			var reportTwo = jack.report("globalFunctionTwo");
+			value_of(reportOne.expected).should_be(1);
+			value_of(reportOne.actual).should_be(0);
+			value_of(reportTwo.expected).should_be(1);
+			value_of(reportTwo.actual).should_be(1);
+			
+			window.globalFunctionOne = null;
+			window.globalFunctionTwo = null;
+		}
+		,
 		'Should be able to specify argument contstraints: Equal (Strings)': function() {
 			window.globalFunctionOne = function() {}
 			window.globalFunctionTwo = function() {}
