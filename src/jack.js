@@ -151,7 +151,7 @@
 			'expect': expect,
 			'report': report,
 			'mock': mock,
-			'arguments': arguments
+			'arguments': getArguments
 		};
 		
 		function init() {
@@ -277,7 +277,7 @@
 			}
 			return report;
 		}
-		function arguments() {
+		function getArguments() {
 			return savedArguments;
 		}
 	} // END FunctionGrab()
