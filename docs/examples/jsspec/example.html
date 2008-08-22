@@ -10,7 +10,8 @@
 <script type="text/javascript" src="../../../src/jack.js"></script>
 <script type="text/javascript">// <![CDATA[
 
-
+	
+	/** START SPECIFYING FUNCTIONS THAT TESTS RUN AGAINST **/
 	function myGlobalFunction() {
 		return "This is myGlobalFunction()";
 	}
@@ -19,6 +20,9 @@
 	window.myGlobalObject.functionOne = function() {
 		return "This is myGlobalObject.functionOne()";
 	}
+	/** END SPECIFYING FUNCTIONS THAT TESTS RUN AGAINST **/
+
+
 
 	describe('Examples of successful expectations', {
 		'Expected function is called': function() {
@@ -46,6 +50,13 @@
 		'Expected function not called on object': function() {
 			jack(function(){
 				jack.expect("myGlobalObject.functionOne");
+			});
+		}
+		,
+		'Expected function called with wrong arguments': function() {
+			jack(function(){
+				jack.expect("myGlobalFunction").withArguments("foo","bar");
+				myGlobalFunction("goo","baz");
 			});
 		}
 	});

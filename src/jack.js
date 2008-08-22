@@ -106,8 +106,8 @@
 			}
 			return findGrab(name).expect().once();
 		}
-		function report(name) {
-			return findGrab(name).report();
+		function report(name, expectation) {
+			return findGrab(name).report(expectation);
 		}
 		function findGrab(name) {
 			var parts = name.split(".");
@@ -159,10 +159,15 @@
 		}
 		function handleInvocation() {
 			var invocation = {
-				matched: true	
+				'arguments': arguments,
+				'matchingExpectation': null
 			};
 			invocations.push(invocation);
-			var expectation = expectations[0];
+			var expectation = findMatchingExpectation(invocation);
+			if(expectation != null) {
+				expectation._matchingInvocations.push(invocation);
+				invocation.matchingExpectation = expectation;
+			}			
 			if(expectation && expectation._saveArguments) {
 				savedArguments = arguments;
 				for(var i=0; i<expectation._saveArgumentNames.length; i++) {
@@ -170,19 +175,33 @@
 					savedArguments[name] = savedArguments[i];
 				}
 			}
-			if(expectation && expectation._argumentConstraints != null) {
-				var constr = expectation._argumentConstraints;
-				for(var i=0; i<constr.length; i++) {
-					if(constr[i] != savedArguments[i]) {
-						expectation._argumentConstraintsMet = false;
-						invocation.matched = false;
-					}
-				}
-			}
 			if(mockImplementation == null) {
 				grabbedFunction.apply(this,arguments);
 			} else {
 				return mockImplementation.apply(this,arguments);	
+			}
+		}
+		function findMatchingExpectation(invocation) {
+			for(var i=0; i<expectations.length; i++) {
+				var expectation = expectations[i];
+				if(isArgumentContstraintsMatching(invocation, expectation)) {
+					return expectation;
+				}
+			}
+			return null;
+		}
+		function isArgumentContstraintsMatching(invocation, expectation) {
+			var constr = expectation._argumentConstraints;
+			var arg = invocation.arguments;
+			if(constr == null) {
+				return true;
+			} else {
+				for(var i=0; i<constr.length; i++) {
+					if(constr[i] != arg[i]) {
+						return false;
+					}
+				}
+				return true;
 			}
 		}
 		function reset() {
@@ -193,12 +212,14 @@
 		}
 		function expect() {
 			var ex = {};
+			ex._id = expectations.length;
 			ex._times = 0;
 			ex._timesModifier = 0;
 			ex._saveArguments = false;
 			ex._saveArgumentNames = [];
 			ex._argumentConstraints = null;
 			ex._argumentConstraintsMet = true;
+			ex._matchingInvocations = [];
 			ex.mock = mock;
 			ex.atLeast = function(n) { ex._times = parseTimes(n); ex._timesModifier = 1; return ex; }
 			ex.atMost  = function(n) { ex._times = parseTimes(n); ex._timesModifier = -1; return ex; }
@@ -227,32 +248,32 @@
 			}
 			return result;
 		}
-		function report() {
-			var report = { expected:0, actual: 0, success:true, fail:false };
-			report.actual = 0;
-			for(var i=0; i<invocations.length; i++) {
-				if(invocations[i].matched) {
-					report.actual++;
-				}
+		function report(expectation) {
+			if(expectation == null) {
+				expectation = expectations[0];
 			}
-			if(expectations.length>0) {
-				var ex = expectations[0];
-				report.expected = ex._times;
-				if(ex._timesModifier == 0 && report.actual != report.expected) {
+			var report = { expected:0, actual: 0, success:true, fail:false };
+			if(expectation == null) {
+				report.actual = invocations.length;
+				if(report.actual != report.expected) {
 					report.fail = true;
 					report.success = false;
 				}
-				if(ex._timesModifier > 0 && report.actual < report.expected) {
+			} else {
+				report.actual = expectation._matchingInvocations.length;
+				report.expected = expectation._times;
+				if(expectation._timesModifier == 0 && report.actual != report.expected) {
 					report.fail = true;
 					report.success = false;
 				}
-				if(ex._timesModifier < 0 && report.actual > report.expected) {
+				if(expectation._timesModifier > 0 && report.actual < report.expected) {
 					report.fail = true;
 					report.success = false;
 				}
-			} else if(report.actual != report.expected) {
-				report.fail = true;
-				report.success = false;
+				if(expectation._timesModifier < 0 && report.actual > report.expected) {
+					report.fail = true;
+					report.success = false;
+				}
 			}
 			return report;
 		}

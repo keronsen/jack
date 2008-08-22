@@ -10,6 +10,13 @@
 <script type="text/javascript" src="../src/jack.js"></script>
 <script type="text/javascript">// <![CDATA[
 
+
+
+
+
+
+
+
 	describe('Jack API', {
 		before_all: function() {
 			jack.env.disableReporting();
@@ -225,6 +232,23 @@
 			window.functionTwo = null;
 		}
 		,
+		'Should assign an expectation id for reporting purposes': function() {
+			window.globalTestFunction = function() { }
+			
+			var expectations = [];
+			jack(function(){
+				expectations[0] = jack.expect("globalTestFunction").exactly("4 times");
+				expectations[1] = jack.expect("globalTestFunction").exactly("9 times");
+			});
+			
+			value_of(expectations[0]._id).should_be(0);
+			value_of(expectations[1]._id).should_be(1);
+			value_of(jack.report("globalTestFunction",expectations[0]).expected).should_be(4);
+			value_of(jack.report("globalTestFunction",expectations[1]).expected).should_be(9);
+			
+			window.globalTestFunction = null;
+		}
+		,
 		'Should start fresh when jack() is called a second time': function() {
 			window.globalTestFunction = function() { }
 			
@@ -350,6 +374,12 @@
 	
 	
 	
+	
+	
+	
+	
+	
+	
 	describe('Saving arguments', {
 		'Should be able to save arguments': function() {
 			window.globalFunction = function() {}
@@ -411,6 +441,12 @@
 			window.globalFunction = null;
 		}
 	});
+	
+	
+	
+	
+	
+	
 	
 	
 	
@@ -554,6 +590,17 @@
 		}
 	});
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	describe('Setting expectations for arguments', {
 		before_all: function() {
 			jack.env.disableReporting();
@@ -588,6 +635,16 @@
 	});
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	describe('Setting different expectations for multiple calls to same function', {
 		before_all: function() {
 			jack.env.disableReporting();
@@ -596,7 +653,47 @@
 		after_all: function() {
 			jack.env.enableReporting();
 		}
+		,
+		'Should register expectations and invocations for the right argument list': function() {
+			window.globalFunctionOne = function() {}
+			
+			var ex = [];
+			jack(function(){
+				ex[0] = jack.expect("globalFunctionOne").exactly("5 times").withArguments("argValue1","argValue2");
+				ex[1] = jack.expect("globalFunctionOne").exactly("6 times").withArguments("argValue3");
+				ex[2] = jack.expect("globalFunctionOne").exactly("7 times").withArguments("argValue4","argValue5","argValue6");
+				
+				window.globalFunctionOne("argValue1","argValue2");
+				window.globalFunctionOne("argValue1","argValue2");
+				window.globalFunctionOne("argValue3");
+				window.globalFunctionOne("argValue3");
+				window.globalFunctionOne("argValue3");
+				window.globalFunctionOne("argValue4","argValue5","argValue6");
+				window.globalFunctionOne("argValue4","argValue5","argValue6");
+				window.globalFunctionOne("argValue4","argValue5","argValue6");
+				window.globalFunctionOne("argValue4","argValue5","argValue6");
+			});
+			
+			value_of(jack.report("globalFunctionOne",ex[0]).expected).should_be(5);
+			value_of(jack.report("globalFunctionOne",ex[1]).expected).should_be(6);
+			value_of(jack.report("globalFunctionOne",ex[2]).expected).should_be(7);
+			value_of(jack.report("globalFunctionOne",ex[0]).actual).should_be(2);
+			value_of(jack.report("globalFunctionOne",ex[1]).actual).should_be(3);
+			value_of(jack.report("globalFunctionOne",ex[2]).actual).should_be(4);
+			
+			window.globalFunctionOne = null;
+		}
 	});
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	describe('JSSpec integration',{
