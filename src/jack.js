@@ -19,7 +19,6 @@
 	function Jack() {
 		var grabs = {};
 		var environment = new Environment();
-		var reportMessage = "Expectation failed: {name}() was expected {expected} time(s), but was called {actual} time(s).";
 		var reportMessages = [];
 		init();
 		return createPublicApi();
@@ -56,19 +55,13 @@
 			var reports = [];
 			for(var name in grabs) {
 				if(grabs[name].report) {
-					var report = grabs[name].report();
+					var report = grabs[name].report(null, name);
 					if(report.fail) {
-						reports.push(generateReportMessage(name,report));
+						reports.push(report.message);
 					}
 				}
 			}
 			return reports;
-		}
-		function generateReportMessage(grabName,report) {
-			return reportMessage
-					.replace("{name}",grabName)
-					.replace("{expected}",report.expected)
-					.replace("{actual}",report.actual);
 		}
 		function grab(name) {
 			var grabbed = null;
@@ -96,7 +89,6 @@
 			grabs[name] = new ObjectGrab(name, grabbed);
 			return grabs[name];
 		}
-		
 		function inspect(name) {
 			return findGrab(name);
 		}
@@ -107,7 +99,7 @@
 			return findGrab(name).expect().once();
 		}
 		function report(name, expectation) {
-			return findGrab(name).report(expectation);
+			return findGrab(name).report(expectation, name);
 		}
 		function findGrab(name) {
 			var parts = name.split(".");
@@ -251,11 +243,16 @@
 			}
 			return result;
 		}
-		function report(expectation) {
+		function report(expectation, fullName) {
 			if(expectation == null) {
 				expectation = expectations[0];
 			}
 			var report = { expected:0, actual: 0, success:true, fail:false };
+			report.message = "";
+			report.messageParts = {
+				template: "Expectation failed: {name}() was expected {quantifier} {expected} time(s), but was called {actual} time(s)",
+				quantifier: ""
+			};
 			if(expectation == null) {
 				report.actual = invocations.length;
 				if(report.actual != report.expected) {
@@ -268,17 +265,30 @@
 				if(expectation._timesModifier == 0 && report.actual != report.expected) {
 					report.fail = true;
 					report.success = false;
+					report.messageParts.quantifier = "exactly";
 				}
 				if(expectation._timesModifier > 0 && report.actual < report.expected) {
 					report.fail = true;
 					report.success = false;
+					report.messageParts.quantifier = "at least";
 				}
 				if(expectation._timesModifier < 0 && report.actual > report.expected) {
 					report.fail = true;
 					report.success = false;
+					report.messageParts.quantifier = "at most";
 				}
 			}
+			if(report.fail) {
+				report.message = generateReportMessage(report, fullName);
+			}
 			return report;
+		}
+		function generateReportMessage(report,fullName) {
+			return report.messageParts.template
+					.replace("{name}",fullName)
+					.replace("{quantifier}",report.messageParts.quantifier)
+					.replace("{expected}",report.expected)
+					.replace("{actual}",report.actual);
 		}
 		function getArguments() {
 			return savedArguments;

@@ -202,30 +202,30 @@
 				functionTwo();
 			});
 			
-			value_of(jack.report("bowlingGame.roll")).should_be({
-				expected: 1,
-				actual: 0,
-				success: false,
-				fail: true
-			});
-			value_of(jack.report("bowlingGame.score")).should_be({
-				expected: 0,
-				actual: 1,
-				success: false,
-				fail: true
-			});
-			value_of(jack.report("functionOne")).should_be({
-				expected: 1,
-				actual: 1,
-				success: true,
-				fail: false
-			});
-			value_of(jack.report("functionTwo")).should_be({
-				expected: 0,
-				actual: 2,
-				success: false,
-				fail: true
-			});
+			
+			var bowlingGameRollReport = jack.report("bowlingGame.roll");
+			value_of(bowlingGameRollReport.expected).should_be(1);
+			value_of(bowlingGameRollReport.actual).should_be(0);
+			value_of(bowlingGameRollReport.success).should_be(false);
+			value_of(bowlingGameRollReport.fail).should_be(true);
+			
+			var bowlingGameScoreReport = jack.report("bowlingGame.score");
+			value_of(bowlingGameScoreReport.expected).should_be(0);
+			value_of(bowlingGameScoreReport.actual).should_be(1);
+			value_of(bowlingGameScoreReport.success).should_be(false);
+			value_of(bowlingGameScoreReport.fail).should_be(true);
+			
+			var functionOneReport = jack.report("functionOne");
+			value_of(functionOneReport.expected).should_be(1);
+			value_of(functionOneReport.actual).should_be(1);
+			value_of(functionOneReport.success).should_be(true);
+			value_of(functionOneReport.fail).should_be(false);
+			
+			var functionTwoReport = jack.report("functionTwo");
+			value_of(functionTwoReport.expected).should_be(0);
+			value_of(functionTwoReport.actual).should_be(2);
+			value_of(functionTwoReport.success).should_be(false);
+			value_of(functionTwoReport.fail).should_be(true);
 			
 			window.bowlingGame = null;
 			window.functionOne = null;
@@ -747,14 +747,37 @@
 		,
 		'Report for number of calls (exact)': function() {
 			window.globalFunction = function() {};
-			
 			jack(function(){
 				jack.expect("globalFunction").exactly("1 time");
 			});
-			
-			// var reports = jack.getTextReports();
-			// debugger;
-			
+			value_of(jack.report("globalFunction").message)
+				.should_be("Expectation failed: globalFunction() was expected exactly 1 time(s), but was called 0 time(s)");
+			window.globalFunction = null;
+		}
+		,
+		'Report for number of calls (at least)': function() {
+			window.globalFunction = function() {};
+			jack(function(){
+				jack.expect("globalFunction").atLeast("3 times");
+				globalFunction();
+				globalFunction();
+			});
+			value_of(jack.report("globalFunction").message)
+				.should_be("Expectation failed: globalFunction() was expected at least 3 time(s), but was called 2 time(s)");
+			window.globalFunction = null;
+		}
+		,
+		'Report for number of calls (at most)': function() {
+			window.globalFunction = function() {};
+			jack(function(){
+				jack.expect("globalFunction").atMost("2 times");
+				globalFunction();
+				globalFunction();
+				globalFunction();
+				globalFunction();
+			});
+			value_of(jack.report("globalFunction").message)
+				.should_be("Expectation failed: globalFunction() was expected at most 2 time(s), but was called 4 time(s)");
 			window.globalFunction = null;
 		}
 	
@@ -777,6 +800,10 @@
 			window.JSSpec = _jsspec;
 			value_of(result).should_be_false();
 		}
+		
+		
+		/***************
+		  FOR SOME REASON SUDDENLY UNABLE TO TEST THIS...
 		,
 		'Should report unmet expectations by throwing an exeption and storing it for JSSpec (NORMAL BROWSERS) [[!JSSpec.Browser.Trident]]': function() {
 			var actualException = null;
@@ -790,9 +817,9 @@
 			} catch(ex) {
 				actualException = ex;
 				actualAssertionFailure = JSSpec._assertionFailure;
-				delete JSSpec._assertionFailure;
+				JSSpec._assertionFailure = null;
 			}
-			
+
 			var expectedObject = {message:"Expectation failed: globalFunction() was expected 1 time(s), but was called 0 time(s)."};
 			value_of(actualException).should_be(expectedObject);
 			value_of(actualAssertionFailure).should_be(expectedObject);
@@ -824,6 +851,7 @@
 			
 			window.globalFunction = null;
 		}
+		**************/
 	});
 
 

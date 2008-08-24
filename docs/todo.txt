@@ -2,6 +2,7 @@
 BUGS:
 
 * IE reports failed expectations multiple times
+* Unable to test parts of JSSpec integration
 
 
 FEATURES: 
