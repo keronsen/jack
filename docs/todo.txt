@@ -7,7 +7,7 @@ BUGS:
 
 FEATURES: 
 
-* Text reporting for "at least", "at most" etc...
+* Verify working text reports for multiple expectations for same function
 * Support for mocking/stubbing any function or object with multiple function
 * Support specifying argument constraints in expectations
 	- type
@@ -25,6 +25,7 @@ FEATURES:
 
 DONE:
 
+* Text reporting for "at least", "at most" etc...
 * Support setting multiple expectations for a function
 * Refactor to storing separate invocation data
 * Simple argument equality constraints
