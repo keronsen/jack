@@ -59,6 +59,13 @@
 				myGlobalFunction("goo","baz");
 			});
 		}
+		,
+		'Expected call on local mock': function() {
+			jack(function(){
+				var localMock = jack.create("localMock",['functionOne']);
+				jack.expect("localMock.functionOne").exactly("1 time");
+			});
+		}
 	});
 	
 	describe('Examples of mock implementations', {

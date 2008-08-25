@@ -91,8 +91,10 @@
 				functionName = nameParts[1];
 			} else if(nameParts.length > 1) {
 				functionName = nameParts.pop();
-				var parentName = nameParts.join(".");
-				eval("parentObject = " + parentName);
+				if(parentObject == window) {
+					var parentName = nameParts.join(".");
+					eval("parentObject = " + parentName);
+				}
 			}
 			grabs[fullName] = new FunctionGrab(functionName, grabbed, parentObject);
 			return grabs[fullName];
@@ -105,8 +107,9 @@
 			var mockObject = {};
 			for(var i=0; i<functionNames.length; i++) {
 				mockObject[functionNames[i]] = function() {};
+				var fullName = objectName+"."+functionNames[i];
+				grabFunction(fullName, mockObject[functionNames[i]], mockObject);
 			}
-			grabObject(objectName, mockObject);
 			return mockObject;
 		}
 		function inspect(name) {
