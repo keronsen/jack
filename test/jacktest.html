@@ -400,6 +400,19 @@
 			window.jQuery = null;
 		}
 		,
+		'Should be able to specify a simple mock implementation that just returns a value': function() {
+			var expectedReturnValue = "Expected return value";
+			var actualReturnValue = null;
+			
+			jack(function(){
+				var mockObject = jack.create("mockObject",['mockFunction']);
+				jack.expect("mockObject.mockFunction").returnValue(expectedReturnValue);
+				actualReturnValue = mockObject.mockFunction();
+			});
+			
+			value_of(actualReturnValue).should_be(expectedReturnValue);
+		}
+		,
 		'Should not have to call grab() before expect()': function() {
 			window.globalFunction = function() {}
 			

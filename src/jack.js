@@ -241,6 +241,7 @@
 			ex._matchingInvocations = [];
 			ex.mock = mock;
 			ex.stub = stub;
+			ex.returnValue = function(v) { mockImplementation = function() { return v; } }
 			ex.atLeast = function(n) { ex._times = parseTimes(n); ex._timesModifier = 1; return ex; }
 			ex.atMost  = function(n) { ex._times = parseTimes(n); ex._timesModifier = -1; return ex; }
 			ex.exactly = function(n) { ex._times = parseTimes(n); return ex; }
