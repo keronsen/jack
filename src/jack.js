@@ -29,6 +29,7 @@
 		function createPublicApi() {
 			var api = jackFunction;
 			api.grab = grab;
+			api.create = create;
 			api.inspect = inspect;
 			api.expect = expect;
 			api.report = report;
@@ -100,11 +101,19 @@
 			grabs[name] = new ObjectGrab(name, grabbed);
 			return grabs[name];
 		}
+		function create(objectName, functionNames) {
+			var mockObject = {};
+			for(var i=0; i<functionNames.length; i++) {
+				mockObject[functionNames[i]] = function() {};
+			}
+			grabObject(objectName, mockObject);
+			return mockObject;
+		}
 		function inspect(name) {
 			return findGrab(name);
 		}
 		function expect(name) {
-			if(grabs[name]==null) {
+			if(findGrab(name) == null) {
 				grab(name);
 			}
 			return findGrab(name).expect().once();

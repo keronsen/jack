@@ -201,6 +201,18 @@
 			value_of(realFunctionTwoHasBeenRun).should_be_true();
 		}
 		,
+		'Should be able to create an object with stubbed functions on the fly': function() {
+			var mockFunctionWasCalled = false;
+			jack(function(){
+				var mockObject = jack.create("myMock",['functionOne','functionTwo']);
+				jack.expect("myMock.functionOne").mock(function() {
+					mockFunctionWasCalled = true;
+				});
+				mockObject.functionOne();
+			});
+			value_of(mockFunctionWasCalled).should_be_true();
+		}
+		,
 		'Should report how well expectations are met': function() {			
 			window.bowlingGame = { roll:function(){}, score:function(){} };
 			window.functionOne = function() {}
