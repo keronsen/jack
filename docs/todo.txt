@@ -8,6 +8,7 @@ BUGS:
 FEATURES: 
 
 * Verify working text reports for multiple expectations for same function
+* Different mock implementations for multiple expectations
 * Support for mocking/stubbing any function or object with multiple function
 * Support specifying argument constraints in expectations
 	- type

@@ -63,21 +63,32 @@
 			}
 			return reports;
 		}
-		function grab(name) {
-			var grabbed = null;
-			eval("grabbed = " + name);
-			if("function" == typeof grabbed) {
-				return grabFunction(name, grabbed);
-			} else if("object" == typeof grabbed) {
-				return grabObject(name, grabbed);
+		function grab() {
+			if("object" == typeof arguments[0] && "string" == typeof arguments[1]) {
+				var parentObject = arguments[0];
+				var name = arguments[1];
+				var fullName = "[local]." + name;
+				return grabFunction(fullName, parentObject[name], parentObject);
+			} else {
+				var grabbed = null;
+				eval("grabbed = " + arguments[0]);
+				if("function" == typeof grabbed) {
+					return grabFunction(arguments[0], grabbed);
+				} else if("object" == typeof grabbed) {
+					return grabObject(arguments[0], grabbed);
+				}
+				return null;
 			}
-			return null;
 		}
-		function grabFunction(fullName, grabbed) {
+		function grabFunction(fullName, grabbed, parentObject) {
+			if(parentObject == null) {
+				parentObject = window;
+			}
 			var functionName = fullName;
-			var parentObject = window;
 			var nameParts = fullName.split(".");
-			if(nameParts.length > 1) {
+			if(nameParts[0] == "[local]") {
+				functionName = nameParts[1];
+			} else if(nameParts.length > 1) {
 				functionName = nameParts.pop();
 				var parentName = nameParts.join(".");
 				eval("parentObject = " + parentName);
@@ -135,6 +146,7 @@
 		var expectations = [];
 		var mockImplementation;
 		var savedArguments;
+		var emptyFunction = function(){};
 		
 		init();
 		return {
@@ -143,6 +155,7 @@
 			'expect': expect,
 			'report': report,
 			'mock': mock,
+			'stub': stub,
 			'arguments': getArguments
 		};
 		
@@ -204,6 +217,9 @@
 		function mock(implementation) {
 			mockImplementation = implementation;
 		}
+		function stub() {
+			mockImplementation = emptyFunction;
+		}
 		function expect() {
 			var ex = {};
 			ex._id = expectations.length;
@@ -215,6 +231,7 @@
 			ex._argumentConstraintsMet = true;
 			ex._matchingInvocations = [];
 			ex.mock = mock;
+			ex.stub = stub;
 			ex.atLeast = function(n) { ex._times = parseTimes(n); ex._timesModifier = 1; return ex; }
 			ex.atMost  = function(n) { ex._times = parseTimes(n); ex._timesModifier = -1; return ex; }
 			ex.exactly = function(n) { ex._times = parseTimes(n); return ex; }

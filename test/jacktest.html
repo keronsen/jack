@@ -184,6 +184,23 @@
 			window.globalObject = null;
 		}
 		,
+		'Should be able to grab a single function from a non-global, specified object)': function() {
+			var realFunctionOneHasBeenRun = false;
+			var realFunctionTwoHasBeenRun = false;
+			var localObject = {};
+			localObject.functionOne = function() { realFunctionHasBeenRun = true; }
+			localObject.functionTwo = function() { realFunctionTwoHasBeenRun = true; }
+			
+			jack(function(){
+				jack.grab(localObject, "functionOne").stub();
+				localObject.functionOne();
+				localObject.functionTwo();
+			});
+			
+			value_of(realFunctionOneHasBeenRun).should_be_false();
+			value_of(realFunctionTwoHasBeenRun).should_be_true();
+		}
+		,
 		'Should report how well expectations are met': function() {			
 			window.bowlingGame = { roll:function(){}, score:function(){} };
 			window.functionOne = function() {}
@@ -264,6 +281,22 @@
 			value_of(jack.inspect("globalTestFunction")).should_be_undefined();
 			
 			window.globalTestFunction = null;
+		}
+		,
+		'Should be able to stub functions (prevent original function being called)': function() {
+			var realJQueryAjaxCalled = false;
+			window.jQuery = { 
+				ajax:function(){ realJQueryAjaxCalled = true; }
+			}
+			
+			jack(function(){
+				jack.expect("jQuery.ajax").stub();
+				jQuery.ajax();
+			});
+			
+			value_of(realJQueryAjaxCalled).should_be_false();
+			
+			window.jQuery = null;
 		}
 		,
 		'Should be able to specify mock implementations': function() {
