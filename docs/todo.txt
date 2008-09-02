@@ -13,12 +13,12 @@ FEATURES:
 * Verify working text reports for multiple expectations for same function
 * Support specifying number of expected calls
 	- never()
-* Integration with Scriptaculous test runner
 * Different mock implementations for multiple expectations
 
 
 DONE:
 
+* Integration with Scriptaculous test runner
 * Text reporting for "at least", "at most" etc...
 * Support setting multiple expectations for a function
 * Refactor to storing separate invocation data

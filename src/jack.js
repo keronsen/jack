@@ -36,20 +36,30 @@
 			api.env = environment;
 			return api;
 		}
-		function jackFunction(func) {
+		function jackFunction() {
+			var delegate, testCase;
+			switch(arguments.length) {
+				case 1:
+					delegate = arguments[0];
+					break;
+				case 2:
+					testCase = arguments[0];
+					delegate = arguments[1];
+					break;
+			}
 			before();
-			func();
-			after();
+			delegate();
+			after(testCase);
 		}
 		function before() {
 			grabs = {};
 			environment.reset();
 		}
-		function after() {
+		function after(testCase) {
 			var reports = getTextReports();
 			resetGrabs();
 			if(reports.length > 0) {
-				environment.report(reports[0]);
+				environment.report(reports[0], testCase);
 			}
 		}
 		function getTextReports() {
@@ -366,6 +376,7 @@
 		init();
 		return {
 			'isJSSpec': isJSSpec,
+			'isScriptaculous': isScriptaculous,
 			'report': report,
 			'disableReporting': function() { reportingEnabled = false; },
 			'enableReporting': function() { reportingEnabled = true; },
@@ -377,9 +388,14 @@
 		function isJSSpec() {
 			return window.JSSpec != null;
 		}
-		function report(message) {
+		function isScriptaculous() {
+			return window.Test != null && window.Test.Unit != null && window.Test.Unit.Runner != null;
+		}
+		function report(message, testCase) {
 			if(!reportingEnabled) { return; }
-			if(isJSSpec() && !reports[message]) {
+			if(isScriptaculous()) {
+				testCase.fail(message);
+			} else if(isJSSpec() && !reports[message]) {
 				JSSpec._assertionFailure = {'message':message};
 				if(JSSpec.Browser.Trident) {
 					var exec = window._curExecutor;
