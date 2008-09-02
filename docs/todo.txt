@@ -5,7 +5,7 @@
  -> Release on boss.bekk.no
 ***********************************
 
-BUGS:
+BUGFIXES:
 (None)
 
 
@@ -19,6 +19,7 @@ FEATURES:
 
 DONE:
 
+* Support specifying advanced argument constraints in expectations
 * Integration with Scriptaculous test runner
 * Text reporting for "at least", "at most" etc...
 * Support setting multiple expectations for a function
@@ -42,18 +43,21 @@ DONE:
  LATER RELEASES
 ***********************************
 
-BUGS:
+BUGFIXES:
 
 * IE reports failed expectations multiple times
 * Unable to test parts of JSSpec integration
 
 
+REFACTORING:
+
+* Extract expectation code to a "interface"
+
+
 FEATURES: 
 
-* Support specifying argument constraints in expectations
 * Support grabbing deeper objects. Currently only one level.
 * Report line numbers for failed expectations (may not be possible)
-
 
 
 
@@ -63,29 +67,6 @@ FEATURES:
 ***********************************
 
 * Argument constraints
-	- equal
-		withArguments(isValue('Homer'), isValue('Simpson'), isValue(true), isValue(313))
-	- not
-		withArguments(isNotValue('Homer'))
-	- regex
-		withArguments(
-	- one of ...
-		withArguments(isOneOf('Maggie','Marge','Lisa'))
-	- type
-		withArguments(isType('string'), isType('object'))
-	- object properties
-		withArguments(hasProperty('name'))
-		withArguments(hasProperty('name','Homer'))
-		withArguments(hasProperies({name:'Homer',message:'DOH!'})
-	- delegate constraints
-		withArguments(myCustomConstraint)
-		function myCustomConstraint(arg) { return true/false }
-	- chained constraints for each argument
-		withArguments(isValue('Maggie').or().isValue('Lisa'))
-		withArguments(hasProperty('name','Homer').and().hasProperty('message','DOH!'))
-		withArguments(hasProperty('name','Homer').or().hasProperty('message','DOH!'))
-
-* Alternate syntax for arguments:
 	jack.expect("something.setSometing")
 		.whereArgument(0).is('Doh!')
 		.whereArgument(1).isNot('Maggie')

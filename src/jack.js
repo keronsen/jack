@@ -226,8 +226,11 @@
 				return false;
 			} else {
 				for(var i=0; i<constr.length; i++) {
-					if(typeof constr[i] == "function" && !constr[i](arg[i])) {
-						return false;
+					if(!constr[i]) { continue; }
+					for(var j=0; j<constr[i].length; j++) {
+						if(typeof constr[i][j] == "function" && !constr[i][j](arg[i])) {
+							return false;
+						}
 					}
 				}
 				return true;
@@ -278,20 +281,54 @@
 			ex.whereArgument = function(argIndex) {
 				ex._saveArguments = true; 
 				ex._argumentConstraints = ex._argumentConstraints || [];
-				return {
-					is: function(expected) { 
-						ex._argumentConstraints[argIndex] = function(actual) { return actual == expected }
-						return ex;
-					},
-					isNot: function(expected) {
-						ex._argumentConstraints[argIndex] = function(actual) { return actual != expected }
-						return ex;
-					},
-					matches: function(regex) {
-						ex._argumentConstraints[argIndex] = function(actual) { return actual.match(regex) }
-						return ex;
+				function addConstraint(constr) {
+					ex._argumentConstraints[argIndex] = ex._argumentConstraints[argIndex] || [];
+					ex._argumentConstraints[argIndex].push(constr);
+				}
+				var argEx = {}
+				argEx.is = function(expected) { 
+					addConstraint(function(actual) { return actual == expected });
+					return ex;
+				}
+				argEx.isOneOf = function() {
+					var expected = arguments;
+					addConstraint(function(actual) {
+						for(var i=0; i<expected.length; i++) {
+							if(actual == expected[i]) { 
+								return true;
+							}
+						}
+						return false;
+					});
+				}
+				argEx.isNot = function(expected) {
+					addConstraint(function(actual) { return actual != expected });
+					return ex;
+				}
+				argEx.isType = function(expected) {
+					addConstraint(function(actual) { return typeof actual == expected });
+					return ex;
+				}
+				argEx.matches = function(regex) {
+					addConstraint(function(actual) { return actual.match(regex) });
+					return ex;
+				}
+				argEx.hasProperty = function(name, value) {
+					var valueIsSpecified = (arguments.length==2);
+					addConstraint(function(actual) { 
+						if(valueIsSpecified) {
+							return actual[name] == value;
+						} else {
+							return typeof actual[name] != "undefined";
+						}
+					});
+				}
+				argEx.hasProperties = function(keysAndValues) {
+					for(key in keysAndValues) {
+						argEx.hasProperty(key, keysAndValues[key]);
 					}
 				}
+				return argEx;
 			}
 			expectations.push(ex);
 			return ex;
