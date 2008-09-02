@@ -1,27 +1,20 @@
 
+
+***********************************
+ Alpha 0.1 - PLANNED
+***********************************
+
 BUGS:
-
-* IE reports failed expectations multiple times
-* Unable to test parts of JSSpec integration
+(None)
 
 
-FEATURES: 
-
+FEATURES:
+ 
 * Verify working text reports for multiple expectations for same function
-* Different mock implementations for multiple expectations
-* Support for mocking/stubbing any function or object with multiple function
-* Support specifying argument constraints in expectations
-	- type
-	- delegate constraints to function(arg) { return true/false; }
 * Support specifying number of expected calls
 	- never()
-
-* Support specifying a return object directly
-    - example: ooo.returnValue(myValue)
-    - instead of: ooo.mock(function(){return myValue})
-* Support grabbing deeper objects. Currently only one level.
 * Integration with Scriptaculous test runner
-* Report line numbers for failed expectations (may not be possible)
+* Different mock implementations for multiple expectations
 
 
 DONE:
@@ -37,3 +30,30 @@ DONE:
 	- atMost(n)
     - exactly(n)
 	- once()
+* Support specifying a return object directly
+    - example: ooo.returnValue(myValue)
+    - instead of: ooo.mock(function(){return myValue})
+* Support for mocking/stubbing any function or object with multiple function
+
+
+
+***********************************
+ LATER RELEASES
+***********************************
+
+BUGS:
+
+* IE reports failed expectations multiple times
+* Unable to test parts of JSSpec integration
+
+
+FEATURES: 
+
+* Support specifying argument constraints in expectations
+	- type
+	- delegate constraints to function(arg) { return true/false; }
+* Support grabbing deeper objects. Currently only one level.
+* Report line numbers for failed expectations (may not be possible)
+
+
+
