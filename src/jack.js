@@ -226,7 +226,7 @@
 				return false;
 			} else {
 				for(var i=0; i<constr.length; i++) {
-					if(constr[i] != arg[i]) {
+					if(typeof constr[i] == "function" && !constr[i](arg[i])) {
 						return false;
 					}
 				}
@@ -265,11 +265,34 @@
 				return ex;
 			}
 			ex.withArguments = function() { 
-				ex._saveArguments = true;
-				ex._argumentConstraints = arguments;
+				if(arguments.length==0) {
+					ex._argumentConstraints = [];
+				} else {
+					for(var i=0; i<arguments.length; i++) {
+						ex.whereArgument(i).is(arguments[i]);
+					}
+				}
 				return ex;
 			}
 			ex.withNoArguments = function() { ex.withArguments(); }
+			ex.whereArgument = function(argIndex) {
+				ex._saveArguments = true; 
+				ex._argumentConstraints = ex._argumentConstraints || [];
+				return {
+					is: function(expected) { 
+						ex._argumentConstraints[argIndex] = function(actual) { return actual == expected }
+						return ex;
+					},
+					isNot: function(expected) {
+						ex._argumentConstraints[argIndex] = function(actual) { return actual != expected }
+						return ex;
+					},
+					matches: function(regex) {
+						ex._argumentConstraints[argIndex] = function(actual) { return actual.match(regex) }
+						return ex;
+					}
+				}
+			}
 			expectations.push(ex);
 			return ex;
 		}
