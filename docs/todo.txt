@@ -10,7 +10,11 @@ BUGFIXES:
 
 
 FEATURES:
- 
+
+* Require context as first parameter to jack:
+	jack(this, function() {
+		
+	}); 
 * Verify working text reports for multiple expectations for same function
 * Support specifying number of expected calls
 	- never()
