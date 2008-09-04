@@ -9,12 +9,13 @@ BUGFIXES:
 (None)
 
 
+REFACTORING:
+
+* Maybe integrate using Exceptions instead?
+
+
 FEATURES:
 
-* Require context as first parameter to jack:
-	jack(this, function() {
-		
-	}); 
 * Verify working text reports for multiple expectations for same function
 * Support specifying number of expected calls
 	- never()
@@ -55,11 +56,13 @@ BUGFIXES:
 
 REFACTORING:
 
-* Extract expectation code to a "interface"
+* Split code into smaller parts with more limited responsibilities
 
 
 FEATURES: 
 
+* Integrate with qUnit: http://docs.jquery.com/QUnit
+* Integrate with jsUnit: http://jsunit.net/
 * Support grabbing deeper objects. Currently only one level.
 * Report line numbers for failed expectations (may not be possible)
 
