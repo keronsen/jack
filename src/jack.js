@@ -166,8 +166,6 @@
 	function FunctionGrab(functionName, grabbedFunction, parentObject) {
 		var invocations = [];
 		var expectations = [];
-		var mockImplementation;
-		var savedArguments;
 		var emptyFunction = function(){};
 		
 		init();
@@ -194,18 +192,19 @@
 			if(expectation != null) {
 				expectation._matchingInvocations.push(invocation);
 				invocation.matchingExpectation = expectation;
-			}			
+			}
 			if(expectation && expectation._saveArguments) {
-				savedArguments = arguments;
 				for(var i=0; i<expectation._saveArgumentNames.length; i++) {
 					var name = expectation._saveArgumentNames[i];
-					savedArguments[name] = savedArguments[i];
+					invocation.arguments[name] = invocation.arguments[i];
 				}
 			}
-			if(mockImplementation == null) {
+			if(expectation == null) {
+				grabbedFunction.apply(this,arguments);
+			} else if(expectation._mockImplementation == null) {
 				grabbedFunction.apply(this,arguments);
 			} else {
-				return mockImplementation.apply(this,arguments);	
+				return expectation._mockImplementation.apply(this,arguments);	
 			}
 		}
 		function findMatchingExpectation(invocation) {
@@ -240,10 +239,10 @@
 			parentObject[functionName] = grabbedFunction;
 		}
 		function mock(implementation) {
-			mockImplementation = implementation;
+			return expect().mock(implementation);
 		}
 		function stub() {
-			mockImplementation = emptyFunction;
+			return expect().stub();
 		}
 		function expect() {
 			var ex = {};
@@ -255,9 +254,10 @@
 			ex._argumentConstraints = null;
 			ex._argumentConstraintsMet = true;
 			ex._matchingInvocations = [];
-			ex.mock = mock;
-			ex.stub = stub;
-			ex.returnValue = function(v) { mockImplementation = function() { return v; } }
+			ex._mockImplementation = null;
+			ex.mock = function(implementation) { ex._mockImplementation = implementation };
+			ex.stub = function() { ex._mockImplementation = emptyFunction };
+			ex.returnValue = function(v) { ex._mockImplementation = function() { return v; } }
 			ex.atLeast = function(n) { ex._times = parseTimes(n); ex._timesModifier = 1; return ex; }
 			ex.atMost  = function(n) { ex._times = parseTimes(n); ex._timesModifier = -1; return ex; }
 			ex.exactly = function(n) { ex._times = parseTimes(n); return ex; }
@@ -391,7 +391,7 @@
 					.replace("{actual}",report.actual);
 		}
 		function getArguments() {
-			return savedArguments;
+			return invocations[0].arguments;
 		}
 	} // END FunctionGrab()
 	
