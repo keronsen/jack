@@ -66,6 +66,18 @@
 				jack.expect("localMock.functionOne").exactly("1 time");
 			});
 		}
+		,
+		'Expectation with argument constraints': function() {
+			jack(function(){
+				var localMock = jack.create("localMock",['functionOne']);
+				jack.expect("localMock.functionOne")
+					.exactly("1 time")
+					.whereArgument(0).is("foo")
+					.whereArgument(1).is(true)
+					.whereArgument(2).isNot("bar")
+					.whereArgument(3).isOneOf("one","or","the","other");
+			});
+		}
 	});
 	
 	describe('Examples of mock implementations', {
