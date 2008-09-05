@@ -1228,7 +1228,24 @@
 			window.MyQuery = null
 		}
 		,
-		'Confusion between objects and functions, maybe?':function() {
+		'FIXED: Is not failing when first expectation is met': function() {
+			jack(function(){	
+				jack
+					.expect("MyQuery")
+					.exactly('1 times')
+					.whereArgument(0).is('#entryform');
+								
+				jack
+					.expect("MyQuery")
+					.exactly("1 times")
+					.whereArgument(0).is('#entry');
+				
+				MyQuery('#entryform');				
+				MyQuery('#entry');
+			});
+		}
+		,
+		'FIXED: Confusion between objects and functions, maybe?':function() {
 			jack(function(){
 				jack
 					.expect("MyQuery")
@@ -1298,7 +1315,7 @@
 					.mock(function(selector) {
 						return textArea;
 					});
-			   
+			   		
 				 jack
 					.expect('textArea.val').atLeast("1 time");
 					
