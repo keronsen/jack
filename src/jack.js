@@ -17,7 +17,8 @@
 	 * Constructor for object that will be exposed as the global jack
 	 */
 	function Jack() {
-		var grabs = {};
+		var functionGrabs = {};
+		var objectGrabs = {};
 		var environment = new Environment();
 		var reportMessages = [];
 		init();
@@ -33,6 +34,7 @@
 			api.inspect = inspect;
 			api.expect = expect;
 			api.report = report;
+			api.reportAll = reportAll;
 			api.env = environment;
 			return api;
 		}
@@ -52,7 +54,8 @@
 			after(testCase);
 		}
 		function before() {
-			grabs = {};
+			functionGrabs = {};
+			objectGrabs = {};
 			environment.reset();
 		}
 		function after(testCase) {
@@ -63,16 +66,24 @@
 			}
 		}
 		function getTextReports() {
-			var reports = [];
-			for(var name in grabs) {
-				if(grabs[name].report) {
-					var report = grabs[name].report(null, name);
-					if(report.fail) {
-						reports.push(report.message);
+			var failedReports = [];
+			for(var name in functionGrabs) {
+				var reports = functionGrabs[name].reportAll(name);
+				for(var i=0; i<reports.length; i++) {
+					if(reports[i].fail) {
+						failedReports.push(reports[i].message);
 					}
 				}
 			}
-			return reports;
+			for(var name in objectGrabs) {
+				var reports = objectGrabs[name].report(name);
+				for(var i=0; i<reports.length; i++) {
+					if(reports[i].fail) {
+						failedReports.push(reports[i].message);
+					}
+				}
+			}
+			return failedReports;
 		}
 		function grab() {
 			if("object" == typeof arguments[0] && "string" == typeof arguments[1]) {
@@ -84,7 +95,10 @@
 				var grabbed = null;
 				eval("grabbed = " + arguments[0]);
 				if("function" == typeof grabbed) {
-					return grabFunction(arguments[0], grabbed);
+					var functionGrab = grabFunction(arguments[0], grabbed);
+					eval("grabbed = " + arguments[0]);
+					grabObject(arguments[0], grabbed);
+					return functionGrab;
 				} else if("object" == typeof grabbed) {
 					return grabObject(arguments[0], grabbed);
 				}
@@ -106,12 +120,12 @@
 					eval("parentObject = " + parentName);
 				}
 			}
-			grabs[fullName] = new FunctionGrab(functionName, grabbed, parentObject);
-			return grabs[fullName];
+			functionGrabs[fullName] = new FunctionGrab(functionName, grabbed, parentObject);
+			return functionGrabs[fullName];
 		}
 		function grabObject(name, grabbed) {
-			grabs[name] = new ObjectGrab(name, grabbed);
-			return grabs[name];
+			objectGrabs[name] = new ObjectGrab(name, grabbed);
+			return objectGrabs[name];
 		}
 		function create(objectName, functionNames) {
 			var mockObject = {};
@@ -134,25 +148,34 @@
 		function report(name, expectation) {
 			return findGrab(name).report(expectation, name);
 		}
+		function reportAll(name) {
+			return findGrab(name).reportAll(name);
+		}
 		function findGrab(name) {
 			var parts = name.split(".");
-			if(parts.length == 1) {
-				return grabs[name];
+			if(parts.length == 1 && functionGrabs[name] != null) {
+				return functionGrabs[name];
+			} else if(parts.length == 1 && objectGrabs[name] != null) {
+				return objectGrabs[name];
 			} else {
-				if(grabs[name] != undefined) {
-					return grabs[name];
+				if(functionGrabs[name] != null) {
+					return functionGrabs[name];
 				}
-				var grab = grabs[parts[0]];
-				if(grab == undefined) {
-					return undefined;
-				} else {
-					return grab.examine(parts[1]);
+				if(objectGrabs[name] != null) {
+					return objectGrabs[name];
 				}
+				if(objectGrabs[parts[0]] != null) {
+					return objectGrabs[parts[0]].examine(parts[1]);
+				}
+				return undefined;
 			}
 		}
 		function resetGrabs() {
-			for(var g in grabs) {
-				grabs[g].reset();
+			for(var g in functionGrabs) {
+				functionGrabs[g].reset();
+			}
+			for(var g in objectGrabs) {
+				objectGrabs[g].reset();
 			}
 		}
 	} // END Jack()
@@ -174,13 +197,22 @@
 			'reset': reset,
 			'expect': expect,
 			'report': report,
+			'reportAll': reportAll,
 			'mock': mock,
 			'stub': stub,
-			'arguments': getArguments
+			'arguments': getArguments,
+			'name': function() { return functionName }
 		};
 		
 		function init() {
-			parentObject[functionName] = handleInvocation;
+			var original = parentObject[functionName];
+			var handler = function() {
+				return handleInvocation.apply(this,arguments);
+			}
+			for(var prop in original) {
+				handler[prop] = original[prop];
+			}
+			parentObject[functionName] = handler;
 		}
 		function handleInvocation() {
 			var invocation = {
@@ -343,6 +375,13 @@
 			}
 			return result;
 		}
+		function reportAll(fullName) {
+			var reports = [];
+			for(var i=0; i<expectations.length; i++) {
+				reports.push(report(expectations[i], fullName));
+			}
+			return reports;
+		}
 		function report(expectation, fullName) {
 			if(expectation == null) {
 				expectation = expectations[0];
@@ -404,7 +443,10 @@
 		
 		init();
 		return {
-			'examine': examine,
+			'examine': getGrab,
+			'report': report,
+			'getGrab': getGrab,
+			'getGrabs': function() {  return grabs },
 			'reset': reset
 		};
 		
@@ -416,7 +458,17 @@
 				}
 			}
 		}
-		function examine(name) {
+		function report(name) {
+			var allReports = [];
+			for(var g in grabs) {
+				var reports = grabs[g].reportAll(name+"."+grabs[g].name());
+				for(var i=0; i<reports.length; i++) {
+					allReports.push(reports[i]);
+				}
+			}
+			return allReports;
+		}
+		function getGrab(name) {
 			return grabs[name];
 		}
 		function reset() {

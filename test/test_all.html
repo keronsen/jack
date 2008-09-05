@@ -971,6 +971,22 @@
 			
 			window.globalFunctionOne = null;
 		}
+		,
+		'Should report for all expectations': function() {
+			window.globalFunctionOne = function() {}
+			
+			var ex = [];
+			jack(function(){
+				ex[0] = jack.expect("globalFunctionOne").exactly("5 times").withArguments("argValue1","argValue2");
+				ex[1] = jack.expect("globalFunctionOne").exactly("6 times").withArguments("argValue3");
+				ex[2] = jack.expect("globalFunctionOne").exactly("7 times").withArguments("argValue4","argValue5","argValue6");
+			});
+			
+			value_of(jack.reportAll("globalFunctionOne")).should_have(3, "items");
+			value_of(jack.reportAll("globalFunctionOne")[0].expected).should_be(5);
+			
+			window.globalFunctionOne = null;
+		}
 	});
 	
 	
@@ -978,6 +994,51 @@
 	
 	
 	
+	describe('Setting expectations for functions that also have properties', {
+		before_each: function() {
+			window.MyQuery = function() {}
+			window.MyQuery.post = function() {}
+		}
+		,
+		after_each: function() {
+			window.MyQuery = null
+		}
+		,
+		before_all: function() {
+			jack.env.disableReporting();
+		}
+		,
+		after_all: function() {
+			jack.env.enableReporting();
+		}
+		,
+		'Should register expectations': function() {
+			jack(function(){
+				jack.expect("MyQuery").exactly("2 times");
+				jack.expect("MyQuery.post").exactly("5 time");
+			});
+			value_of(jack.report("MyQuery").expected).should_be(2);
+			value_of(jack.report("MyQuery.post").expected).should_be(5);
+		}
+		,
+		'Should register calls': function() {
+			jack(function(){
+				jack.expect("MyQuery").exactly("2 times");
+				jack.expect("MyQuery.post").exactly("5 time");
+				MyQuery("foo");
+				MyQuery("foo");
+				MyQuery.post("bar");
+			});			
+			value_of(jack.report("MyQuery").actual).should_be(2);
+			value_of(jack.report("MyQuery.post").actual).should_be(1);
+		}
+	});
+	
+	
+
+
+
+
 	describe('Text reports', {
 		before_all: function() {
 			jack.env.disableReporting();
@@ -992,7 +1053,7 @@
 			jack(function(){
 				jack.expect("globalFunction").exactly("1 time");
 			});
-			value_of(jack.report("globalFunction").message)
+			value_of(jack.reportAll("globalFunction")[0].message)
 				.should_be("Expectation failed: globalFunction() was expected exactly 1 time(s), but was called 0 time(s)");
 			window.globalFunction = null;
 		}
@@ -1004,7 +1065,7 @@
 				globalFunction();
 				globalFunction();
 			});
-			value_of(jack.report("globalFunction").message)
+			value_of(jack.reportAll("globalFunction")[0].message)
 				.should_be("Expectation failed: globalFunction() was expected at least 3 time(s), but was called 2 time(s)");
 			window.globalFunction = null;
 		}
@@ -1018,11 +1079,23 @@
 				globalFunction();
 				globalFunction();
 			});
-			value_of(jack.report("globalFunction").message)
+			value_of(jack.reportAll("globalFunction")[0].message)
 				.should_be("Expectation failed: globalFunction() was expected at most 2 time(s), but was called 4 time(s)");
 			window.globalFunction = null;
 		}
-	
+		,
+		'Report correct name for object grabs': function() {
+			window.globalObject = function() {};
+			window.globalObject.globalFunction = function() {};
+			jack(function(){
+				jack.expect("globalObject").exactly("1 time");
+				jack.expect("globalObject.globalFunction").exactly("1 time");
+			});
+			value_of(jack.reportAll("globalObject").length).should_be(1);
+			value_of(jack.reportAll("globalObject.globalFunction")[0].message)
+				.should_be("Expectation failed: globalObject.globalFunction() was expected exactly 1 time(s), but was called 0 time(s)");
+			window.globalObject = null;
+		}
 	
 	});
 	
@@ -1030,7 +1103,7 @@
 	
 	
 	
-	describe('JSSpec integration',{
+	describe('Integration with JSSpec',{
 		'Should know when JSSpec is in environment': function() {
 			value_of(jack.env.isJSSpec()).should_be_true();
 		}
@@ -1148,10 +1221,29 @@
 	describe('Fixing reported bugs', {
 		before_each: function() {
 			window.MyQuery = function() {}
+			window.MyQuery.post = function() {}
 		}
 		,
 		after_each: function() {
 			window.MyQuery = null
+		}
+		,
+		'Confusion between objects and functions, maybe?':function() {
+			jack(function(){
+				jack
+					.expect("MyQuery")
+					.exactly("1 time")
+					.whereArgument(0).is('#myForm');
+					
+				jack
+					.expect("MyQuery.post")
+					.exactly("1 time")
+					.whereArgument(0).is('/twit/feed')
+					.whereArgument(1).hasProperty('entry','crappadore');
+				
+				MyQuery("#myForm");
+				MyQuery.post("/twit/feed", { 'entry':'crappadore' });
+			});
 		}
 		,
 		'FIXED: Matches wrong expectation':function() {
@@ -1184,7 +1276,8 @@
 				MyQuery('#entryform').bind();				
 				MyQuery('#entry').val();
 			});
-		},
+		}
+		,
 		'FIXED: Order of expectations seems to matter':function() {
 			jack(function(){
 				var textArea = jack.create('textArea', ['val']);       
