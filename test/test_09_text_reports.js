@@ -1,0 +1,61 @@
+
+
+describe('Text reports', {
+	before_all: function() {
+		jack.env.disableReporting();
+	}
+	,
+	after_all: function() {
+		jack.env.enableReporting();
+	}
+	,
+	'Report for number of calls (exact)': function() {
+		window.globalFunction = function() {};
+		jack(function(){
+			jack.expect("globalFunction").exactly("1 time");
+		});
+		value_of(jack.reportAll("globalFunction")[0].message)
+			.should_be("Expectation failed: globalFunction() was expected exactly 1 time(s), but was called 0 time(s)");
+		window.globalFunction = null;
+	}
+	,
+	'Report for number of calls (at least)': function() {
+		window.globalFunction = function() {};
+		jack(function(){
+			jack.expect("globalFunction").atLeast("3 times");
+			globalFunction();
+			globalFunction();
+		});
+		value_of(jack.reportAll("globalFunction")[0].message)
+			.should_be("Expectation failed: globalFunction() was expected at least 3 time(s), but was called 2 time(s)");
+		window.globalFunction = null;
+	}
+	,
+	'Report for number of calls (at most)': function() {
+		window.globalFunction = function() {};
+		jack(function(){
+			jack.expect("globalFunction").atMost("2 times");
+			globalFunction();
+			globalFunction();
+			globalFunction();
+			globalFunction();
+		});
+		value_of(jack.reportAll("globalFunction")[0].message)
+			.should_be("Expectation failed: globalFunction() was expected at most 2 time(s), but was called 4 time(s)");
+		window.globalFunction = null;
+	}
+	,
+	'Report correct name for object grabs': function() {
+		window.globalObject = function() {};
+		window.globalObject.globalFunction = function() {};
+		jack(function(){
+			jack.expect("globalObject").exactly("1 time");
+			jack.expect("globalObject.globalFunction").exactly("1 time");
+		});
+		value_of(jack.reportAll("globalObject").length).should_be(1);
+		value_of(jack.reportAll("globalObject.globalFunction")[0].message)
+			.should_be("Expectation failed: globalObject.globalFunction() was expected exactly 1 time(s), but was called 0 time(s)");
+		window.globalObject = null;
+	}
+
+});
