@@ -57,5 +57,57 @@ describe('Text reports', {
 			.should_be("Expectation failed: globalObject.globalFunction() was expected exactly 1 time(s), but was called 0 time(s)");
 		window.globalObject = null;
 	}
-
+	,
+	'Report values for is() constraints': function() {
+		window.globalFunction = function() {};
+		jack(function(){
+			jack.expect("globalFunction")
+				.exactly("1 time")
+				.whereArgument(0).is("foo")
+				.whereArgument(1).is(true)
+				.whereArgument(2).is(1001);
+		});
+		value_of(jack.reportAll("globalFunction")[0].message)
+			.should_be('Expectation failed: globalFunction("foo", true, 1001) was expected exactly 1 time(s), but was called 0 time(s)');
+		window.globalFunction = null;
+	}
+	,
+	'Report values for isNot() constraints': function() {
+		window.globalFunction = function() {};
+		jack(function(){
+			jack.expect("globalFunction")
+				.exactly("1 time")
+				.whereArgument(0).isNot("foo")
+				.whereArgument(1).isNot(true)
+				.whereArgument(2).isNot(1001);
+		});
+		value_of(jack.reportAll("globalFunction")[0].message)
+			.should_be('Expectation failed: globalFunction(not:"foo", not:true, not:1001) was expected exactly 1 time(s), but was called 0 time(s)');
+		window.globalFunction = null;
+	}
+	,
+	'Report values for isOneOf() constraints': function() {
+		window.globalFunction = function() {};
+		jack(function(){
+			jack.expect("globalFunction")
+				.exactly("1 time")
+				.whereArgument(0).isOneOf("foo",true,1001)
+				.whereArgument(1).isOneOf(false,3002,"bar");
+		});
+		value_of(jack.reportAll("globalFunction")[0].message)
+			.should_be('Expectation failed: globalFunction(oneOf:["foo",true,1001], oneOf:[false,3002,"bar"]) was expected exactly 1 time(s), but was called 0 time(s)');
+		window.globalFunction = null;
+	}
+	,
+	'Report [any] for arguments without constraints': function() {
+		window.globalFunction = function() {};
+		jack(function(){
+			jack.expect("globalFunction")
+				.exactly("1 time")
+				.whereArgument(1).is("bar");
+		});
+		value_of(jack.reportAll("globalFunction")[0].message)
+			.should_be('Expectation failed: globalFunction([any], "bar") was expected exactly 1 time(s), but was called 0 time(s)');
+		window.globalFunction = null;
+	}
 });

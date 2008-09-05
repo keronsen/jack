@@ -16,14 +16,23 @@ REFACTORING:
 
 FEATURES:
 
-* Verify working text reports for multiple expectations for same function
+* Text reports for argument constraints:
+	- isType()
+	- matches()
+	- hasProperty()
+	- hasProperties()
 * Support specifying number of expected calls
 	- never()
-* Different mock implementations for multiple expectations
 
 
 DONE:
 
+* Text reports for argument constraints:
+	- is()
+	- isNot()
+	- isOneOf()
+* Verify working text reports for multiple expectations for same function
+* Different mock implementations for multiple expectations
 * Support specifying advanced argument constraints in expectations
 * Integration with Scriptaculous test runner
 * Text reporting for "at least", "at most" etc...

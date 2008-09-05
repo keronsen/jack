@@ -313,41 +313,52 @@
 			ex.whereArgument = function(argIndex) {
 				ex._saveArguments = true; 
 				ex._argumentConstraints = ex._argumentConstraints || [];
-				function addConstraint(constr) {
+				function addConstraint(display, constr) {
+					constr.display = display;
 					ex._argumentConstraints[argIndex] = ex._argumentConstraints[argIndex] || [];
 					ex._argumentConstraints[argIndex].push(constr);
 				}
+				function createDisplayValue(prefix, value) {
+					return typeof value == "string" ? prefix + '"'+value+'"' : prefix+value;
+				}
 				var argEx = {}
 				argEx.is = function(expected) { 
-					addConstraint(function(actual) { return actual == expected });
+					addConstraint(createDisplayValue('', expected), function(actual) { return actual == expected });
 					return ex;
 				}
 				argEx.isOneOf = function() {
 					var expected = arguments;
-					addConstraint(function(actual) {
-						for(var i=0; i<expected.length; i++) {
-							if(actual == expected[i]) { 
-								return true;
+					var display = [];
+					for(var i=0; i<expected.length; i++) {
+						display.push(createDisplayValue('', expected[i]));
+					}
+					addConstraint(
+						'oneOf:['+display.join(',')+']', 
+						function(actual) {
+							for(var i=0; i<expected.length; i++) {
+								if(actual == expected[i]) { 
+									return true;
+								}
 							}
-						}
-						return false;
-					});
+							return false;
+						});
+					return ex;
 				}
 				argEx.isNot = function(expected) {
-					addConstraint(function(actual) { return actual != expected });
+					addConstraint(createDisplayValue('not:', expected), function(actual) { return actual != expected });
 					return ex;
 				}
 				argEx.isType = function(expected) {
-					addConstraint(function(actual) { return typeof actual == expected });
+					addConstraint('', function(actual) { return typeof actual == expected });
 					return ex;
 				}
 				argEx.matches = function(regex) {
-					addConstraint(function(actual) { return actual.match(regex) });
+					addConstraint('', function(actual) { return actual.match(regex) });
 					return ex;
 				}
 				argEx.hasProperty = function(name, value) {
 					var valueIsSpecified = (arguments.length==2);
-					addConstraint(function(actual) { 
+					addConstraint('', function(actual) { 
 						if(valueIsSpecified) {
 							return actual[name] == value;
 						} else {
@@ -389,7 +400,7 @@
 			var report = { expected:0, actual: 0, success:true, fail:false };
 			report.message = "";
 			report.messageParts = {
-				template: "Expectation failed: {name}() was expected {quantifier} {expected} time(s), but was called {actual} time(s)",
+				template: "Expectation failed: {name}({arguments}) was expected {quantifier} {expected} time(s), but was called {actual} time(s)",
 				quantifier: ""
 			};
 			if(expectation == null) {
@@ -418,16 +429,36 @@
 				}
 			}
 			if(report.fail) {
-				report.message = generateReportMessage(report, fullName);
+				report.message = generateReportMessage(report, fullName, getArgumentsDisplay(expectation));
 			}
 			return report;
 		}
-		function generateReportMessage(report,fullName) {
+		function generateReportMessage(report, fullName, argumentsDisplay) {
 			return report.messageParts.template
 					.replace("{name}",fullName)
+					.replace("{arguments}",argumentsDisplay)
 					.replace("{quantifier}",report.messageParts.quantifier)
 					.replace("{expected}",report.expected)
 					.replace("{actual}",report.actual);
+		}
+		function getArgumentsDisplay(expectation) {
+			if(expectation == null) {
+				return "";
+			}
+			var displayValues = [];
+			var constraints = expectation._argumentConstraints;
+			if(constraints == null) {
+				return "";
+			} else {
+				for(var i=0; i<constraints.length; i++) {
+					if(constraints[i] != null) {
+						displayValues.push(constraints[i][0].display);
+					} else {
+						displayValues.push('[any]');
+					}
+				}
+				return displayValues.join(', ');
+			}
 		}
 		function getArguments() {
 			return invocations[0].arguments;
