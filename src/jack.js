@@ -365,11 +365,13 @@
 							return typeof actual[name] != "undefined";
 						}
 					});
+					return ex;
 				}
 				argEx.hasProperties = function(keysAndValues) {
 					for(key in keysAndValues) {
 						argEx.hasProperty(key, keysAndValues[key]);
 					}
+					return ex;
 				}
 				return argEx;
 			}
