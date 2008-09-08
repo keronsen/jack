@@ -23,6 +23,7 @@ FEATURES:
 	- hasProperties()
 * Support specifying number of expected calls
 	- never()
+* When reporting an expectation error, also report actual calls
 
 
 DONE:
