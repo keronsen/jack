@@ -21,12 +21,10 @@
 		var objectGrabs = {};
 		var environment = new Environment();
 		var reportMessages = [];
-		init();
-		return createPublicApi();
+		var currentExpectation = null;
+		var publicApi = createPublicApi();
+		return publicApi;
 		
-		function init() {
-			
-		}
 		function createPublicApi() {
 			var api = jackFunction;
 			api.grab = grab;
@@ -50,13 +48,50 @@
 					break;
 			}
 			before();
-			delegate();
+			firstPass(delegate);
+			// secondPass(delegate);
 			after(testCase);
 		}
 		function before() {
 			functionGrabs = {};
 			objectGrabs = {};
 			environment.reset();
+		}
+		function firstPass(delegate) {
+			delegate();
+		}
+		function secondPass(delegate) {
+			var oldExpect = publicApi.expect;
+			publicApi.expect = function(name) { 
+				var fakeEx = {};
+				var grab = findGrab(name);
+				if(grab._beenThroughSecondPass) {
+					var ex = grab.expect();
+					for(prop in ex) {
+						if(typeof ex[prop] == "function") {
+							fakeEx[prop] = function() { return fakeEx; }
+						}
+					}
+				}
+				grab._beenThroughSecondPass = true;
+				return fakeEx;
+			};
+			var findMore = true;
+			for(var i=0; findMore && i<10; i++) {
+				try {
+					delegate();
+					findMore = false;
+				} catch(exception) {
+					var line = -1;
+					if(exception.lineNumber != null) {
+						line = exception.lineNumber;
+					} else if(exception['opera#sourceloc'] != null) {
+						line = exception['opera#sourceloc'];
+					}
+					currentExpectation._lineNumber = line;
+				}
+			}
+			publicApi.expect = oldExpect;
 		}
 		function after(testCase) {
 			var reports = getTextReports();
@@ -143,7 +178,8 @@
 			if(findGrab(name) == null) {
 				grab(name);
 			}
-			return findGrab(name).expect().once();
+			currentExpectation = findGrab(name).expect().once();
+			return currentExpectation;
 		}
 		function report(name, expectation) {
 			return findGrab(name).report(expectation, name);
@@ -189,6 +225,7 @@
 	function FunctionGrab(functionName, grabbedFunction, parentObject) {
 		var invocations = [];
 		var expectations = [];
+		var secondPassExpectations = [];
 		var emptyFunction = function(){};
 		
 		init();
@@ -232,9 +269,9 @@
 				}
 			}
 			if(expectation == null) {
-				grabbedFunction.apply(this,arguments);
+				return grabbedFunction.apply(this,arguments);
 			} else if(expectation._mockImplementation == null) {
-				grabbedFunction.apply(this,arguments);
+				return grabbedFunction.apply(this,arguments);
 			} else {
 				return expectation._mockImplementation.apply(this,arguments);	
 			}
@@ -269,12 +306,6 @@
 		}
 		function reset() {
 			parentObject[functionName] = grabbedFunction;
-		}
-		function mock(implementation) {
-			return expect().mock(implementation);
-		}
-		function stub() {
-			return expect().stub();
 		}
 		function expect() {
 			var ex = {};
@@ -377,6 +408,12 @@
 			}
 			expectations.push(ex);
 			return ex;
+		}
+		function mock(implementation) {
+			return expect().mock(implementation);
+		}
+		function stub() {
+			return expect().stub();
 		}
 		function parseTimes(expression) {
 			var result = 0;

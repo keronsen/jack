@@ -1,7 +1,11 @@
 
 describe('Setting expectations for functions that also have properties', {
 	before_each: function() {
-		window.MyQuery = function() {}
+		window.OriginalMyQueryWasCalled = false;
+		window.MyQuery = function() { 
+			window.OriginalMyQueryWasCalled = true;
+			return "ThisIsTheOriginalImplementation";
+		}
 		window.MyQuery.post = function() {}
 	}
 	,
@@ -36,5 +40,16 @@ describe('Setting expectations for functions that also have properties', {
 		});			
 		value_of(jack.report("MyQuery").actual).should_be(2);
 		value_of(jack.report("MyQuery.post").actual).should_be(1);
+	}
+	,
+	'Should reset after jack()': function() {
+		jack(function(){
+			jack.expect("MyQuery").exactly("2 times");
+			jack.expect("MyQuery.post").exactly("5 time");
+			MyQuery("foo");
+			MyQuery("foo");
+			MyQuery.post("bar");
+		});
+		value_of(MyQuery.toString()).should_match("ThisIsTheOriginalImplementation");
 	}
 });

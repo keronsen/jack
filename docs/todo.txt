@@ -6,7 +6,8 @@
 ***********************************
 
 BUGFIXES:
-(None)
+
+* In JSSpec/IE, failing tests report errors multiple times. Also makes progress display > 100% when finished
 
 
 REFACTORING:
@@ -23,7 +24,7 @@ FEATURES:
 	- hasProperties()
 * Support specifying number of expected calls
 	- never()
-* When reporting an expectation error, also report actual calls
+* When reporting an expectation that was not met, report other calls to the same function.
 
 
 DONE:

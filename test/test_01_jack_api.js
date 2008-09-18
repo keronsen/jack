@@ -74,6 +74,23 @@ describe('Jack API', {
 		window.globalTestFunction = null;
 	}
 	,
+	'Should return value from grabbed function': function() {
+		var expectedReturnValue = "This is the return value!";
+		var actualReturnValue = null;
+		window.globalTestFunction = function(p1, p2) {
+			return expectedReturnValue;
+		}
+		
+		jack(function(){
+			jack.grab("globalTestFunction");
+			actualReturnValue = globalTestFunction();
+		});
+		
+		value_of(actualReturnValue).should_be(expectedReturnValue);
+		
+		window.globalTestFunction = null;
+	}
+	,
 	'Should reset global functions when finished': function() {
 		var realFunctionHasBeenRun = false;
 		window.globalTestFunction = function() {}
