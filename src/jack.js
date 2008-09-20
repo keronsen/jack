@@ -318,8 +318,8 @@
 			ex._argumentConstraintsMet = true;
 			ex._matchingInvocations = [];
 			ex._mockImplementation = null;
-			ex.mock = function(implementation) { ex._mockImplementation = implementation };
-			ex.stub = function() { ex._mockImplementation = emptyFunction };
+			ex.mock = function(implementation) { ex._mockImplementation = implementation; return ex; };
+			ex.stub = function() { ex._mockImplementation = emptyFunction; return ex; };
 			ex.returnValue = function(v) { ex._mockImplementation = function() { return v; } }
 			ex.atLeast = function(n) { ex._times = parseTimes(n); ex._timesModifier = 1; return ex; }
 			ex.atMost  = function(n) { ex._times = parseTimes(n); ex._timesModifier = -1; return ex; }

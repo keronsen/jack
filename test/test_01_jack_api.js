@@ -302,8 +302,10 @@ describe('Jack API', {
 		}
 		
 		jack(function(){
+			var returnValueFromJackStub =
 			jack.expect("jQuery.ajax").stub();
 			jQuery.ajax();
+			value_of(returnValueFromJackStub).should_not_be_undefined();
 		});
 		
 		value_of(realJQueryAjaxCalled).should_be_false();
@@ -321,16 +323,19 @@ describe('Jack API', {
 		}
 		
 		jack(function(){
+			var returnValueFromJackMock = 
 			jack.grab("jQuery.ajax").mock(function(){
 				mockJQueryAjaxCalled = true;
 				return expectedReturnValue;
 			});
 			actualReturnValue = jQuery.ajax();
+			value_of(returnValueFromJackMock).should_not_be_undefined();
 		});
 		
 		value_of(realJQueryAjaxCalled).should_be_false();
 		value_of(mockJQueryAjaxCalled).should_be_true();
 		value_of(actualReturnValue).should_be(expectedReturnValue);
+		
 		
 		window.jQuery = null;
 	}
