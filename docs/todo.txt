@@ -7,8 +7,6 @@
 
 BUGFIXES:
 
-* In JSSpec/IE, failing tests report errors multiple times. Also makes progress display > 100% when finished
-
 
 REFACTORING:
 
@@ -29,6 +27,7 @@ FEATURES:
 
 DONE:
 
+* In JSSpec/IE, failing tests report errors multiple times. Also makes progress display > 100% when finished
 * Text reports for argument constraints:
 	- is()
 	- isNot()

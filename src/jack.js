@@ -6,7 +6,7 @@
  */
 
 
-
+function jack() {}
 (function (){ // START HIDING FROM GLOBAL SCOPE
 	/** EXPORT JACK **/
 	window.jack = new Jack();
@@ -554,7 +554,6 @@
 	 */
 	function Environment() {
 		var reportingEnabled = true;
-		var reports = {};
 		init();
 		return {
 			'isJSSpec': isJSSpec,
@@ -562,7 +561,7 @@
 			'report': report,
 			'disableReporting': function() { reportingEnabled = false; },
 			'enableReporting': function() { reportingEnabled = true; },
-			'reset': function() { reports = [] }
+			'reset': function() {}
 		}
 		function init() {
 			
@@ -577,15 +576,8 @@
 			if(!reportingEnabled) { return; }
 			if(isScriptaculous()) {
 				testCase.fail(message);
-			} else if(isJSSpec() && !reports[message]) {
-				JSSpec._assertionFailure = {'message':message};
-				if(JSSpec.Browser.Trident) {
-					var exec = window._curExecutor;
-					exec.onException(exec,JSSpec._assertionFailure);
-				} else {
-					reports[message] = true;
-					throw JSSpec._assertionFailure;
-				}
+			} else if(isJSSpec()) {
+				throw new Error(message);
 			}
 		}
 	}
