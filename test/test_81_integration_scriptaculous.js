@@ -18,18 +18,21 @@ describe('Integration with Scriptaculous testrunner',{
 		value_of(jack.env.isScriptaculous()).should_be_true();
 	}
 	,
-	'Should report to fail() function from provided TestCase': function() {
-		window.globalFunction = function() {};
-		var actualFailureMessage = null;
-		var mockTestCase = {
-			fail: function(message) { actualFailureMessage = message; }
+	'Should report unmet expectations by throwing an exeption': function() {
+		window.globalFunction = function() {}
+		var actualException = null;
+		
+		try {
+			window.globalFunction = function() {};
+			jack(function(){
+				jack.expect("globalFunction").once();
+			});
+		} catch(ex) {
+			actualException = ex;
 		}
 		
-		jack(mockTestCase, function(){
-			jack.expect("globalFunction").once();
-		});
+		value_of(actualException.message).should_be("Expectation failed: globalFunction() was expected exactly 1 time(s), but was called 0 time(s)");
 		
-		value_of(actualFailureMessage).should_be("Expectation failed: globalFunction() was expected exactly 1 time(s), but was called 0 time(s)");
 		window.globalFunction = null;
 	}
 });

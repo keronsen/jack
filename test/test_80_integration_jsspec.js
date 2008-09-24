@@ -13,7 +13,7 @@ describe('Integration with JSSpec',{
 		value_of(result).should_be_false();
 	}
 	,
-	'Should report unmet expectations by throwing an exeption and storing it for JSSpec': function() {
+	'Should report unmet expectations by throwing an exeption': function() {
 		window.globalFunction = function() {}
 		var actualException = null;
 		

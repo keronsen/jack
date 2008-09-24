@@ -36,25 +36,25 @@
 		}},
 		
 		testExpectedFunctionIsCalled: function() { with(this) {
-			jack(this,function(){
+			jack(function(){
 				jack.expect("myGlobalFunction");
 				myGlobalFunction();
 			});
 		}},
 		testExpectedFunctionIsCalledOnObject: function() { with(this) {
-			jack(this,function(){
+			jack(function(){
 				jack.expect("myGlobalObject.functionOne");
 				myGlobalObject.functionOne();
 			});
 		}},
 		
 		testExpectedFunctionNotCalled_FAIL: function() { with(this) {
-			jack(this,function(){
+			jack(function(){
 				jack.expect("myGlobalFunction");
 			});
 		}},
 		testExpectedFunctionNotCalledOnObject_FAIL: function() { with(this) {
-			jack(this,function(){
+			jack(function(){
 				jack.expect("myGlobalObject.functionOne");
 			});
 		}}

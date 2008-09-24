@@ -6,7 +6,8 @@
  */
 
 
-function jack() {}
+function jack() {} // This needs to be here to make error reporting work correctly in IE.
+
 (function (){ // START HIDING FROM GLOBAL SCOPE
 	/** EXPORT JACK **/
 	window.jack = new Jack();
@@ -36,21 +37,11 @@ function jack() {}
 			api.env = environment;
 			return api;
 		}
-		function jackFunction() {
-			var delegate, testCase;
-			switch(arguments.length) {
-				case 1:
-					delegate = arguments[0];
-					break;
-				case 2:
-					testCase = arguments[0];
-					delegate = arguments[1];
-					break;
-			}
+		function jackFunction(delegate) {
 			before();
 			firstPass(delegate);
 			// secondPass(delegate);
-			after(testCase);
+			after();
 		}
 		function before() {
 			functionGrabs = {};
@@ -93,11 +84,11 @@ function jack() {}
 			}
 			publicApi.expect = oldExpect;
 		}
-		function after(testCase) {
+		function after() {
 			var reports = getTextReports();
 			resetGrabs();
 			if(reports.length > 0) {
-				environment.report(reports[0], testCase);
+				environment.report(reports[0]);
 			}
 		}
 		function getTextReports() {
@@ -572,10 +563,10 @@ function jack() {}
 		function isScriptaculous() {
 			return window.Test != null && window.Test.Unit != null && window.Test.Unit.Runner != null;
 		}
-		function report(message, testCase) {
+		function report(message) {
 			if(!reportingEnabled) { return; }
 			if(isScriptaculous()) {
-				testCase.fail(message);
+				throw new Error(message);
 			} else if(isJSSpec()) {
 				throw new Error(message);
 			}
