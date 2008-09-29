@@ -316,6 +316,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			ex.atMost  = function(n) { ex._times = parseTimes(n); ex._timesModifier = -1; return ex; }
 			ex.exactly = function(n) { ex._times = parseTimes(n); return ex; }
 			ex.once = function() { return ex.exactly(1) }
+			ex.never = function() { return ex.exactly(0) }
 			ex.saveArguments = function() { 
 				ex._saveArguments = true; 
 				ex._saveArgumentNames = arguments;

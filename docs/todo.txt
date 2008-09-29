@@ -20,8 +20,6 @@ FEATURES:
 	- matches()
 	- hasProperty()
 	- hasProperties()
-* Support specifying number of expected calls
-	- never()
 * When reporting an expectation that was not met, report other calls to the same function.
 
 
@@ -47,6 +45,7 @@ DONE:
 	- atMost(n)
     - exactly(n)
 	- once()
+	- never()
 * Support specifying a return object directly
     - example: ooo.returnValue(myValue)
     - instead of: ooo.mock(function(){return myValue})

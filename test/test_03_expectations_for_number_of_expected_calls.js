@@ -22,6 +22,21 @@ describe('Setting expectations for number of expected calls', {
 		window.globalFunction = null;
 	}
 	,
+	'Should be able to specify never()': function() {
+		window.globalFunction = function() {}
+		
+		jack(function(){
+			jack.expect("globalFunction").never();
+			globalFunction();
+		});
+		
+		var report = jack.report("globalFunction");
+		value_of(report.expected).should_be(0);
+		value_of(report.actual).should_be(1);
+		
+		window.globalFunction = null;
+	}
+	,
 	'Should be able to specify exact number of expected calls with a string': function() {
 		window.globalFunction = function() {}
 		
