@@ -15,6 +15,10 @@ REFACTORING:
 
 FEATURES:
 
+* Adapt Jack to be useable with env.js - http://ejohn.org/projects/bringing-the-browser-to-the-server
+* Integrate Jack with Screw.Unit - http://github.com/nkallen/screw-unit/tree/master
+* Implement a new jack.verify() syntax that can be called *after* execution instead of jack.expect() that needs to be called *before*
+* Find out how to handle calling of original functions
 * Text reports for argument constraints:
 	- isType()
 	- matches()
