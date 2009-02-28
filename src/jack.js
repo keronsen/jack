@@ -11,6 +11,8 @@ function jack() {} // This needs to be here to make error reporting work correct
 (function (){ // START HIDING FROM GLOBAL SCOPE
 	/** EXPORT JACK **/
 	window.jack = new Jack();
+	window.jack.matchers = new Matchers();
+	window.jack.FunctionInvocation = FunctionInvocation;
 	return;
 	
 	
@@ -32,6 +34,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			api.create = create;
 			api.inspect = inspect;
 			api.expect = expect;
+			api.verify = verify;
 			api.report = report;
 			api.reportAll = reportAll;
 			api.env = environment;
@@ -166,6 +169,13 @@ function jack() {} // This needs to be here to make error reporting work correct
 			return findGrab(name);
 		}
 		function expect(name) {
+			if(findGrab(name) == null) {
+				grab(name);
+			}
+			currentExpectation = findGrab(name).expect().once();
+			return currentExpectation;
+		}
+		function verify(name) {
 			if(findGrab(name) == null) {
 				grab(name);
 			}
@@ -573,6 +583,89 @@ function jack() {} // This needs to be here to make error reporting work correct
 			}
 		}
 	}
+	
+	
+	/**
+	 *
+	 */
+	function FunctionInvocation() {
+		var argumentConstraints = null;
+		
+		return api();
+		
+		function api() {
+			var api = matchers();
+			api.test = test;
+			return api;
+		}
+		function matchers() {
+			var m = {};
+			m.withNoArguments = function() { argumentConstraints = []; }
+			m.withArguments = function() { argumentConstraints = arguments; }
+			m.whereArgument = function(argIndex) {
+				return {};
+			}
+			return m;
+		}
+		function test() {
+			var result = true;
+			if(argumentConstraints != null) {
+				if(arguments.length != argumentConstraints.length) {
+					result = false;
+				} else {
+					for(var i=0; i<argumentConstraints.length; i++) {
+						if(arguments[i] != argumentConstraints[i]) {
+							result = false;
+						}
+					}
+				}
+			}
+			return result;
+		}
+		
+	}
+	
+	
+	/**
+	 *
+	 */
+	function Matchers() {
+		return {
+			'is':          
+				function(a, b) { 
+					return result(a==b); 
+				},
+			'isNot':       
+				function(a, b) { 
+					return result(a!=b); 
+				},
+			'matches':     
+				function(a, b) { 
+					return result(b.test(a))
+				},
+			'hasProperty': 
+				function(a, b, c) { 
+					return result(c ? a[b]==c : a[b]!=undefined)
+				},
+			'hasProperties':
+				function(a, b) { 
+					var match = true;
+					for(var p in b) {
+						if(a[p] != b[p]) {
+							match = false;
+						}
+					}
+					return result(match);
+				}
+		}
+		
+		function result(match) {
+			return {
+				result: match
+			}
+		}
+	}
+	
 })(); // END HIDING FROM GLOBAL SCOPE
 
 

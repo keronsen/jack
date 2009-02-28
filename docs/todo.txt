@@ -15,9 +15,15 @@ REFACTORING:
 
 FEATURES:
 
+* Implement a new jack.verify() syntax that can be called *after* execution instead of jack.expect() that needs to be called *before*
+	- For objects created with jack.create();
+	- For existsing, global objects
+	
+* (Details)
+	- Rename "expectations" to "preparations"
+	
 * Adapt Jack to be useable with env.js - http://ejohn.org/projects/bringing-the-browser-to-the-server
 * Integrate Jack with Screw.Unit - http://github.com/nkallen/screw-unit/tree/master
-* Implement a new jack.verify() syntax that can be called *after* execution instead of jack.expect() that needs to be called *before*
 * Find out how to handle calling of original functions
 * Text reports for argument constraints:
 	- isType()
