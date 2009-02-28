@@ -639,6 +639,10 @@ function jack() {} // This needs to be here to make error reporting work correct
 				function(a, b) { 
 					return result(a!=b); 
 				},
+			'isType': 
+				function(a, b) {
+					return result(b == typeof a);
+				},
 			'matches':     
 				function(a, b) { 
 					return result(b.test(a))

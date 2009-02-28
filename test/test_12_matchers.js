@@ -152,6 +152,20 @@ describe('Matching objects', {
 		}
 		value_of(jack.matchers.hasProperties(objectUnderTest, propertyCheck).result).should_be_true();
 	}
+	,
+	'isType() should match strings': function() {
+		var aString = "A string";
+		var notAString = 1001;
+		value_of(jack.matchers.isType(aString, 'string').result).should_be_true();
+		value_of(jack.matchers.isType(notAString, 'string').result).should_be_false();
+	}
+	,
+	'isType() should match numbers': function() {
+		var aNumber = 1001;
+		var notANumber = "A string";
+		value_of(jack.matchers.isType(aNumber, 'number').result).should_be_true();
+		value_of(jack.matchers.isType(notANumber, 'number').result).should_be_false();
+	}
 });
 
 
