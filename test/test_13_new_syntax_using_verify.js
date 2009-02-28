@@ -27,7 +27,6 @@ describe('Using verify() instead of expect() for objects created with jack.creat
 	}
 	
 	
-	/*
 	,
 	'Should be able to specify a minimum number of expected calls (Example 2)': function() {
 		window.globalFunction = function() {}
@@ -111,7 +110,7 @@ describe('Using verify() instead of expect() for objects created with jack.creat
 		
 		window.globalFunction = null;
 	}
-	*/
+
 });
 
 */

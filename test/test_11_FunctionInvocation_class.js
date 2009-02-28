@@ -34,7 +34,6 @@ describe('FunctionInvocation class', {
 			value_of(typeof matchers[m]).should_be("function");
 		}
 	}
-	/*
 	,
 	'Should check for equal numbers': function() {
 		jack(function(){
@@ -48,7 +47,6 @@ describe('FunctionInvocation class', {
 		value_of(jack.report("globalFunctionOne").actual).should_be(0);
 		value_of(jack.report("globalFunctionTwo").actual).should_be(1);
 	}
-	*/
 });
 
 */
