@@ -37,8 +37,8 @@ FEATURES:
 	- For objects created with jack.create();
 	- For existsing, global objects
 	
-* (Details)
-	- Rename "expectations" to "preparations"
+* Integrate with Screw.Unit (http://github.com/nkallen/screw-unit/tree/master)
+* Integrate with QUnit (http://docs.jquery.com/QUnit)
 
 
 ***********************************
