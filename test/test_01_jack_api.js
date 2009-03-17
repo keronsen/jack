@@ -231,7 +231,6 @@ describe('Jack API', {
 			functionTwo();
 		});
 		
-		
 		var bowlingGameRollReport = jack.report("bowlingGame.roll");
 		value_of(bowlingGameRollReport.expected).should_be(1);
 		value_of(bowlingGameRollReport.actual).should_be(0);

@@ -12,7 +12,9 @@ function jack() {} // This needs to be here to make error reporting work correct
 	/** EXPORT JACK **/
 	window.jack = new Jack();
 	window.jack.matchers = new Matchers();
-	window.jack.FunctionInvocation = FunctionInvocation;
+	window.jack.util = new Util();
+	window.jack.FunctionSpecification = FunctionSpecification;
+	window.jack.FunctionGrab = FunctionGrab;
 	return;
 	
 	
@@ -225,8 +227,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 	 */
 	function FunctionGrab(functionName, grabbedFunction, parentObject) {
 		var invocations = [];
-		var expectations = [];
-		var secondPassExpectations = [];
+		var specifications = [];
 		var emptyFunction = function(){};
 		
 		init();
@@ -234,6 +235,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			'times': function() { return invocations.length; },
 			'reset': reset,
 			'expect': expect,
+			'specify': specify,
 			'report': report,
 			'reportAll': reportAll,
 			'mock': mock,
@@ -253,35 +255,34 @@ function jack() {} // This needs to be here to make error reporting work correct
 			parentObject[functionName] = handler;
 		}
 		function handleInvocation() {
-			var invocation = {
-				'arguments': arguments,
-				'matchingExpectation': null
-			};
+			var invocation = new FunctionSpecification();
+			for(var i=0; i<arguments.length; i++) {
+				invocation.whereArgument(i).is(arguments[i]);
+			}
 			invocations.push(invocation);
-			var expectation = findMatchingExpectation(invocation);
-			if(expectation != null) {
-				expectation._matchingInvocations.push(invocation);
-				invocation.matchingExpectation = expectation;
-			}
-			if(expectation && expectation._saveArguments) {
-				for(var i=0; i<expectation._saveArgumentNames.length; i++) {
-					var name = expectation._saveArgumentNames[i];
-					invocation.arguments[name] = invocation.arguments[i];
-				}
-			}
-			if(expectation == null) {
-				return grabbedFunction.apply(this,arguments);
-			} else if(expectation._mockImplementation == null) {
-				return grabbedFunction.apply(this,arguments);
+			var specification = findSpecificationFor(invocation);
+			if(specification == null) {
+				return grabbedFunction.apply(this, arguments);
+			} else if(specification.hasMockImplementation()) {
+				return specification.invoke.apply(this, arguments);
 			} else {
-				return expectation._mockImplementation.apply(this,arguments);	
+				specification.invoke.apply(this, arguments);
+				return grabbedFunction.apply(this, arguments);
 			}
 		}
-		function findMatchingExpectation(invocation) {
-			for(var i=0; i<expectations.length; i++) {
-				var expectation = expectations[i];
-				if(isArgumentContstraintsMatching(invocation, expectation)) {
-					return expectation;
+		function matchInvocationsToSpecifications() {
+			for(var i=0; i<invocations.length; i++) {
+				var spec = findSpecificationFor(invocations[i]);
+				if(spec != null) {
+					
+				}
+			}
+		}
+		function findSpecificationFor(invocation) {
+			for(var i=0; i<specifications.length; i++) {
+				var specification = specifications[i];
+				if(invocation.satisfies(specification)) {
+					return specification;
 				}
 			}
 			return null;
@@ -308,114 +309,23 @@ function jack() {} // This needs to be here to make error reporting work correct
 		function reset() {
 			parentObject[functionName] = grabbedFunction;
 		}
+		function specify() {
+			var spec = new FunctionSpecification();
+			spec._id = specifications.length;
+			specifications.push(spec);
+			return spec;
+		}
+		function verify() {
+			
+		}
 		function expect() {
-			var ex = {};
-			ex._id = expectations.length;
-			ex._times = 0;
-			ex._timesModifier = 0;
-			ex._saveArguments = false;
-			ex._saveArgumentNames = [];
-			ex._argumentConstraints = null;
-			ex._argumentConstraintsMet = true;
-			ex._matchingInvocations = [];
-			ex._mockImplementation = null;
-			ex.mock = function(implementation) { ex._mockImplementation = implementation; return ex; };
-			ex.stub = function() { ex._mockImplementation = emptyFunction; return ex; };
-			ex.returnValue = function(v) { ex._mockImplementation = function() { return v; } }
-			ex.atLeast = function(n) { ex._times = parseTimes(n); ex._timesModifier = 1; return ex; }
-			ex.atMost  = function(n) { ex._times = parseTimes(n); ex._timesModifier = -1; return ex; }
-			ex.exactly = function(n) { ex._times = parseTimes(n); return ex; }
-			ex.once = function() { return ex.exactly(1) }
-			ex.never = function() { return ex.exactly(0) }
-			ex.saveArguments = function() { 
-				ex._saveArguments = true; 
-				ex._saveArgumentNames = arguments;
-				return ex;
-			}
-			ex.withArguments = function() { 
-				if(arguments.length==0) {
-					ex._argumentConstraints = [];
-				} else {
-					for(var i=0; i<arguments.length; i++) {
-						ex.whereArgument(i).is(arguments[i]);
-					}
-				}
-				return ex;
-			}
-			ex.withNoArguments = function() { ex.withArguments(); }
-			ex.whereArgument = function(argIndex) {
-				ex._saveArguments = true; 
-				ex._argumentConstraints = ex._argumentConstraints || [];
-				function addConstraint(display, constr) {
-					constr.display = display;
-					ex._argumentConstraints[argIndex] = ex._argumentConstraints[argIndex] || [];
-					ex._argumentConstraints[argIndex].push(constr);
-				}
-				function createDisplayValue(prefix, value) {
-					return typeof value == "string" ? prefix + '"'+value+'"' : prefix+value;
-				}
-				var argEx = {}
-				argEx.is = function(expected) { 
-					addConstraint(createDisplayValue('', expected), function(actual) { return actual == expected });
-					return ex;
-				}
-				argEx.isOneOf = function() {
-					var expected = arguments;
-					var display = [];
-					for(var i=0; i<expected.length; i++) {
-						display.push(createDisplayValue('', expected[i]));
-					}
-					addConstraint(
-						'oneOf:['+display.join(',')+']', 
-						function(actual) {
-							for(var i=0; i<expected.length; i++) {
-								if(actual == expected[i]) { 
-									return true;
-								}
-							}
-							return false;
-						});
-					return ex;
-				}
-				argEx.isNot = function(expected) {
-					addConstraint(createDisplayValue('not:', expected), function(actual) { return actual != expected });
-					return ex;
-				}
-				argEx.isType = function(expected) {
-					addConstraint('', function(actual) { return typeof actual == expected });
-					return ex;
-				}
-				argEx.matches = function(regex) {
-					addConstraint('', function(actual) { return actual.match(regex) });
-					return ex;
-				}
-				argEx.hasProperty = function(name, value) {
-					var valueIsSpecified = (arguments.length==2);
-					addConstraint('', function(actual) { 
-						if(valueIsSpecified) {
-							return actual[name] == value;
-						} else {
-							return typeof actual[name] != "undefined";
-						}
-					});
-					return ex;
-				}
-				argEx.hasProperties = function(keysAndValues) {
-					for(key in keysAndValues) {
-						argEx.hasProperty(key, keysAndValues[key]);
-					}
-					return ex;
-				}
-				return argEx;
-			}
-			expectations.push(ex);
-			return ex;
+			return specify();
 		}
 		function mock(implementation) {
 			return expect().mock(implementation);
 		}
 		function stub() {
-			return expect().stub();
+			return expect();
 		}
 		function parseTimes(expression) {
 			var result = 0;
@@ -429,48 +339,28 @@ function jack() {} // This needs to be here to make error reporting work correct
 		}
 		function reportAll(fullName) {
 			var reports = [];
-			for(var i=0; i<expectations.length; i++) {
-				reports.push(report(expectations[i], fullName));
+			for(var i=0; i<specifications.length; i++) {
+				reports.push(report(specifications[i], fullName));
 			}
 			return reports;
 		}
-		function report(expectation, fullName) {
-			if(expectation == null) {
-				expectation = expectations[0];
+		function report(specification, fullName) {
+			if(specification == null) {
+				if(specifications.length == 0) {
+					var spec = specify().never();
+					for(var i=0; i<invocations.length; i++) {
+						spec.invoke();
+					}
+				}
+				specification = specifications[0];
 			}
-			var report = { expected:0, actual: 0, success:true, fail:false };
-			report.message = "";
-			report.messageParts = {
-				template: "Expectation failed: {name}({arguments}) was expected {quantifier} {expected} time(s), but was called {actual} time(s)",
-				quantifier: ""
-			};
-			if(expectation == null) {
-				report.actual = invocations.length;
-				if(report.actual != report.expected) {
-					report.fail = true;
-					report.success = false;
-				}
-			} else {
-				report.actual = expectation._matchingInvocations.length;
-				report.expected = expectation._times;
-				if(expectation._timesModifier == 0 && report.actual != report.expected) {
-					report.fail = true;
-					report.success = false;
-					report.messageParts.quantifier = "exactly";
-				}
-				if(expectation._timesModifier > 0 && report.actual < report.expected) {
-					report.fail = true;
-					report.success = false;
-					report.messageParts.quantifier = "at least";
-				}
-				if(expectation._timesModifier < 0 && report.actual > report.expected) {
-					report.fail = true;
-					report.success = false;
-					report.messageParts.quantifier = "at most";
-				}
-			}
+			var report = {};
+			report.expected = specification.invocations().expected;
+			report.actual = specification.invocations().actual;
+			report.success = specification.testTimes(report.actual);
+			report.fail = !report.success;
 			if(report.fail) {
-				report.message = generateReportMessage(report, fullName, getArgumentsDisplay(expectation));
+				report.message = "Expectation failed: " + specification.describe(fullName);
 			}
 			return report;
 		}
@@ -502,7 +392,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			}
 		}
 		function getArguments() {
-			return invocations[0].arguments;
+			return invocations[0].getArgumentValues();
 		}
 	} // END FunctionGrab()
 	
@@ -584,45 +474,283 @@ function jack() {} // This needs to be here to make error reporting work correct
 		}
 	}
 	
+	/**
+	 * 
+	 */
+	function Util() {
+		return {
+			'displayValue': displayValue
+		}
+		
+		function displayValue() {
+			var value = arguments[0];
+			var prefix = "";
+			if(arguments.length > 1) {
+				value = arguments[1];
+				prefix = arguments[0];
+			}
+			if(value == undefined) {
+				return displayValueNullOrUndefined(value);
+			}
+			var display = displayValueDefault(value);
+			if('string' == typeof value) {
+				display = displayValueString(value);
+			} else if(value.constructor == Array) {
+				display = displayValueArray(value);
+			} else if(value.constructor == RegExp) {
+				display = displayValueRegExp(value);
+			} else if('object' == typeof value) {
+				display = displayValueObject(value);
+			}
+			return prefix + display;
+		}
+		function displayValueDefault(value) {
+			return value.toString();
+		}
+		function displayValueString(value) {
+			return "'" + value + "'";
+		}
+		function displayValueArray(value) {
+			var displayValues = [];
+			for(var i=0; i<value.length; i++) {
+				displayValues.push(displayValue(value[i]));
+			}
+			return "[" + displayValues.join(",") + "]";
+		}
+		function displayValueNullOrUndefined(value) {
+			if(value === undefined) {
+				return "undefined";
+			} else if(value === null) {
+				return "null";
+			}
+		}
+		function displayValueRegExp(value) {
+			return value.toString();
+		}
+		function displayValueObject(value) {
+			var keyValues = [];
+			for(var p in value) {
+				keyValues.push(p + ':' + displayValue(value[p]));
+			}
+			return '{' + keyValues.join(',') + '}';
+		}
+	}
 	
 	/**
 	 *
 	 */
-	function FunctionInvocation() {
-		var argumentConstraints = null;
+	function FunctionSpecification() {
+		var constraints = null;
+		var argumentValues = [];
+		var mockImplementation = null;		
+		var timing = {actual: 0, expected: 1, modifier: 0};
 		
-		return api();
+		var api = createApi();
+		return api;
 		
-		function api() {
-			var api = matchers();
+		function createApi() {
+			var api = {};
+			mixinMatchers(api);
+			mixinTiming(api);
 			api.test = test;
+			api.testTimes = testTimes;
+			api.satisfies = satisfies;
+			api.invoke = invoke;
+			api.mock = mock;
+			api.stub = stub;
+			api.returnValue = returnValue;
+			api.describe = describe;
+			api.invocations = invocations;
+			api.getArgumentValues = getArgumentValues;
+			api.hasMockImplementation = hasMockImplementation;
 			return api;
 		}
-		function matchers() {
-			var m = {};
-			m.withNoArguments = function() { argumentConstraints = []; }
-			m.withArguments = function() { argumentConstraints = arguments; }
-			m.whereArgument = function(argIndex) {
-				return {};
+		function mixinMatchers(api) {
+			api.whereArgument = function(argIndex) {
+				var collected = {};
+				for(var name in jack.matchers) {
+					addMatcher(argIndex, name, collected)
+				}
+				return collected;
 			}
-			return m;
+			api.withArguments = function() { 
+				for(var i=0; i<arguments.length; i++) {
+					api.whereArgument(i).is(arguments[i]);
+				}
+				return api;
+			}
+			api.withNoArguments = function() { constraints = []; return api; }
+			return api;
+			
+			function addMatcher(argIndex, name, collection) {
+				collection[name] = function() {
+					addConstraint(argIndex, jack.matchers[name], arguments);
+					if(name == "is") {
+						addArgumentValue(argIndex, arguments[0]);
+					}
+					return api;
+				}
+			}
+		}
+		function mixinTiming(api) {
+			api.exactly = function(times) {
+				timing.expected = parseTimes(times);
+				return api;
+			}
+			api.once = function() {
+				timing.expected = 1;
+				return api;
+			}
+			api.atLeast = function(times) {
+				timing.expected = parseTimes(times);
+				timing.modifier = 1;
+				return api;
+			}
+			api.atMost = function(times) {
+				timing.expected = parseTimes(times);
+				timing.modifier = -1;
+				return api;
+			}
+			api.never = function() {
+				timing.expected = 0;
+				return api;
+			}
+			
+			function parseTimes(times) {
+				return parseInt(times);
+			}
+		}
+		function addArgumentValue(index, value) {
+			argumentValues[index] = value;
+		}
+		function addConstraint(argIndex, matcher, matcherArguments) {
+			createConstraintsArrayIfNull(argIndex);
+			var constraint = function(value) {
+				var allArguments = [value];
+				for(var i=0; i<matcherArguments.length; i++) {
+					allArguments.push(matcherArguments[i]);
+				}
+				var test = matcher.apply(null, allArguments);
+				return test.result;
+			}
+			constraints[argIndex].push(constraint);
+			constraints[argIndex].describe = function() {
+				var allArguments = [""];
+				for(var i=0; i<matcherArguments.length; i++) {
+					allArguments.push(matcherArguments[i]);
+				}
+				return matcher.apply(null, allArguments).expected;
+			}
+		}
+		function createConstraintsArrayIfNull(argIndex) {
+			if(constraints == null) {
+				constraints = [];
+			}
+			if(constraints[argIndex] == null) {
+				constraints[argIndex] = [];
+			}
 		}
 		function test() {
 			var result = true;
-			if(argumentConstraints != null) {
-				if(arguments.length != argumentConstraints.length) {
+			if(constraints != null) {
+				if(constraints.length != arguments.length) {
 					result = false;
 				} else {
-					for(var i=0; i<argumentConstraints.length; i++) {
-						if(arguments[i] != argumentConstraints[i]) {
-							result = false;
+					for (var i = 0; i < constraints.length; i++) {
+						var oneArgumentsConstraints = constraints[i];
+						if (oneArgumentsConstraints != null) {
+							for (var j = 0; j < oneArgumentsConstraints.length; j++) {
+								var constraint = oneArgumentsConstraints[j];
+								if (constraint && !constraint(arguments[i])) {
+									result = false;
+								}
+							}
 						}
 					}
 				}
 			}
 			return result;
 		}
-		
+		function testTimes(times) {
+			if(timing.modifier == 0) {
+				return times == timing.expected;
+			} else if(timing.modifier == 1) {
+				return times >= timing.expected;
+			} else if(timing.modifier == -1) {
+				return times <= timing.expected;
+			}
+		}
+		function satisfies(other) {
+			return other.test.apply(this, argumentValues);
+		}
+		function invoke() {
+			timing.actual++;
+			if(mockImplementation != null) {
+				return mockImplementation.apply(this, arguments);
+			}
+		}
+		function mock(implementation) {
+			mockImplementation = implementation;
+			return api;
+		}
+		function stub() {
+			mockImplementation = function() {};
+			return api;
+		}
+		function returnValue(value) {
+			mockImplementation = function() {
+				return value;
+			}
+		}
+		function hasMockImplementation() {
+			return mockImplementation != null;
+		}
+		function invocations() {
+			return {
+				actual: timing.actual,
+				expected: timing.expected
+			};
+		}
+		function getArgumentValues() {
+			return argumentValues;
+		}
+		function describe(name) {
+			return name +"(" + describeConstraints() + ") " + describeTimes();
+		}
+		function describeConstraints() {
+			if(constraints == null) {
+				return "";
+			}
+			var descriptions = [];
+			for(var i=0; i<constraints.length; i++) {
+				if(constraints[i] != null) {
+					descriptions.push(constraints[i].describe());
+				} else {
+					descriptions.push("[any]");
+				}
+			}
+			return descriptions.join(", ");
+		}
+		function describeTimes() {
+			var description = timing.expected;
+			if(timing.expected == 1) {
+				description += " time";
+			} else {
+				description += " times";
+			}
+			if(timing.modifier == 0) {
+				description = "expected exactly " + description;
+			} else if(timing.modifier > 0) {
+				description = "expected at least " + description;
+			} else if(timing.modifier < 0) {
+				description = "expected at most " + description;
+			}
+			description += ", called " + timing.actual + " time";
+			if(timing.actual != 1) {
+				description += "s";
+			}
+			return description;
+		}
 	}
 	
 	
@@ -633,23 +761,29 @@ function jack() {} // This needs to be here to make error reporting work correct
 		return {
 			'is':          
 				function(a, b) { 
-					return result(a==b); 
+					return result(a==b, a, '', b); 
 				},
 			'isNot':       
 				function(a, b) { 
-					return result(a!=b); 
+					return result(a!=b, a, 'not:', b); 
 				},
 			'isType': 
 				function(a, b) {
-					return result(b == typeof a);
+					return result(b == typeof a, a, 'type:', b);
 				},
 			'matches':     
 				function(a, b) { 
-					return result(b.test(a))
+					return result(b.test(a), a, 'matching:', b)
 				},
 			'hasProperty': 
 				function(a, b, c) { 
-					return result(c ? a[b]==c : a[b]!=undefined)
+					var match = c ? a[b]==c : a[b]!=undefined;
+					var bDisplay = b;
+					if(c != null) {
+						bDisplay = {};
+						bDisplay[b] = c;
+					}
+					return result(match, a, 'property:', bDisplay)
 				},
 			'hasProperties':
 				function(a, b) { 
@@ -659,13 +793,38 @@ function jack() {} // This needs to be here to make error reporting work correct
 							match = false;
 						}
 					}
-					return result(match);
+					return result(match, a, 'properties:', b);
+				},
+			'isGreaterThan':
+				function(a, b) {
+					return result(b < a, a, '>', b);
+				},
+			'isLessThan':
+				function(a, b) {
+					return result(b > a, a, '<', b);
+				},
+			'isOneOf':
+				function() {
+					var a = arguments[0];
+					var b = [];
+					for(var i=1; i<arguments.length; i++) {
+						b.push(arguments[i]);
+					}
+					var match = false;
+					for(var i=0; i<b.length; i++) {
+						if(b[i] == a) {
+							match = true;
+						}
+					}
+					return result(match, a, 'oneOf:', b);
 				}
 		}
 		
-		function result(match) {
+		function result(match, actual, prefix, expected) {
 			return {
-				result: match
+				result: match,
+				actual: jack.util.displayValue(actual),
+				expected: jack.util.displayValue(prefix, expected)
 			}
 		}
 	}

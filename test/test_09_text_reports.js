@@ -15,7 +15,7 @@ describe('Text reports', {
 			jack.expect("globalFunction").exactly("1 time");
 		});
 		value_of(jack.reportAll("globalFunction")[0].message)
-			.should_be("Expectation failed: globalFunction() was expected exactly 1 time(s), but was called 0 time(s)");
+			.should_be("Expectation failed: globalFunction() expected exactly 1 time, called 0 times");
 		window.globalFunction = null;
 	}
 	,
@@ -27,7 +27,7 @@ describe('Text reports', {
 			globalFunction();
 		});
 		value_of(jack.reportAll("globalFunction")[0].message)
-			.should_be("Expectation failed: globalFunction() was expected at least 3 time(s), but was called 2 time(s)");
+			.should_be("Expectation failed: globalFunction() expected at least 3 times, called 2 times");
 		window.globalFunction = null;
 	}
 	,
@@ -41,7 +41,7 @@ describe('Text reports', {
 			globalFunction();
 		});
 		value_of(jack.reportAll("globalFunction")[0].message)
-			.should_be("Expectation failed: globalFunction() was expected at most 2 time(s), but was called 4 time(s)");
+			.should_be("Expectation failed: globalFunction() expected at most 2 times, called 4 times");
 		window.globalFunction = null;
 	}
 	,
@@ -54,7 +54,7 @@ describe('Text reports', {
 		});
 		value_of(jack.reportAll("globalObject").length).should_be(1);
 		value_of(jack.reportAll("globalObject.globalFunction")[0].message)
-			.should_be("Expectation failed: globalObject.globalFunction() was expected exactly 1 time(s), but was called 0 time(s)");
+			.should_be("Expectation failed: globalObject.globalFunction() expected exactly 1 time, called 0 times");
 		window.globalObject = null;
 	}
 	,
@@ -68,7 +68,7 @@ describe('Text reports', {
 				.whereArgument(2).is(1001);
 		});
 		value_of(jack.reportAll("globalFunction")[0].message)
-			.should_be('Expectation failed: globalFunction("foo", true, 1001) was expected exactly 1 time(s), but was called 0 time(s)');
+			.should_be("Expectation failed: globalFunction('foo', true, 1001) expected exactly 1 time, called 0 times");
 		window.globalFunction = null;
 	}
 	,
@@ -82,7 +82,7 @@ describe('Text reports', {
 				.whereArgument(2).isNot(1001);
 		});
 		value_of(jack.reportAll("globalFunction")[0].message)
-			.should_be('Expectation failed: globalFunction(not:"foo", not:true, not:1001) was expected exactly 1 time(s), but was called 0 time(s)');
+			.should_be("Expectation failed: globalFunction(not:'foo', not:true, not:1001) expected exactly 1 time, called 0 times");
 		window.globalFunction = null;
 	}
 	,
@@ -95,7 +95,7 @@ describe('Text reports', {
 				.whereArgument(1).isOneOf(false,3002,"bar");
 		});
 		value_of(jack.reportAll("globalFunction")[0].message)
-			.should_be('Expectation failed: globalFunction(oneOf:["foo",true,1001], oneOf:[false,3002,"bar"]) was expected exactly 1 time(s), but was called 0 time(s)');
+			.should_be("Expectation failed: globalFunction(oneOf:['foo',true,1001], oneOf:[false,3002,'bar']) expected exactly 1 time, called 0 times");
 		window.globalFunction = null;
 	}
 	,
@@ -107,7 +107,7 @@ describe('Text reports', {
 				.whereArgument(1).is("bar");
 		});
 		value_of(jack.reportAll("globalFunction")[0].message)
-			.should_be('Expectation failed: globalFunction([any], "bar") was expected exactly 1 time(s), but was called 0 time(s)');
+			.should_be("Expectation failed: globalFunction([any], 'bar') expected exactly 1 time, called 0 times");
 		window.globalFunction = null;
 	}
 });

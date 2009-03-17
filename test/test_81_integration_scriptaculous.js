@@ -31,7 +31,7 @@ describe('Integration with Scriptaculous testrunner',{
 			actualException = ex;
 		}
 		
-		value_of(actualException.message).should_be("Expectation failed: globalFunction() was expected exactly 1 time(s), but was called 0 time(s)");
+		value_of(actualException.message).should_be("Expectation failed: globalFunction() expected exactly 1 time, called 0 times");
 		
 		window.globalFunction = null;
 	}

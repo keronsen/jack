@@ -161,4 +161,19 @@ describe('Setting advanced expectations for arguments', {
 		value_of(jack.report("globalFunctionOne").actual).should_be(1);
 		value_of(jack.report("globalFunctionTwo").actual).should_be(0);
 	}
+	,
+	'Should provide all jack.matchers to whereArgument(n)': function() {
+		var actualMathcerNames = [];
+		jack(function() {
+			var matchers = jack.expect("window.open").whereArgument(0);
+			for(var p in matchers) {
+				actualMathcerNames.push(p);
+			}
+		});
+		
+		for (var expectedMatcherName in jack.matchers) { 
+			value_of(actualMathcerNames).should_include(expectedMatcherName);
+		}
+		
+	}
 });

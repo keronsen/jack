@@ -1,19 +1,37 @@
 
 
 ***********************************
- Alpha 0.1 - PLANNED
- -> Release on boss.bekk.no
+ Later releases
 ***********************************
 
 BUGFIXES:
 
+* Unable to test parts of JSSpec integration
+
 
 REFACTORING:
 
-* Maybe integrate using Exceptions instead?
+* Split code into smaller parts with more limited responsibilities
 
 
-FEATURES:
+FEATURES: 
+
+* Integrate with qUnit: http://docs.jquery.com/QUnit
+* Integrate with jsUnit: http://jsunit.net/
+* Support grabbing deeper objects. Currently only one level.
+* Report line numbers for failed expectations (may not be possible)
+
+* Adapt Jack to be useable with env.js - http://ejohn.org/projects/bringing-the-browser-to-the-server
+* Integrate Jack with Screw.Unit - http://github.com/nkallen/screw-unit/tree/master
+* Find out how to handle calling of original functions
+* Text reports for argument constraints:
+* When reporting an expectation that was not met, report other calls to the same function.
+
+
+***********************************
+ "Verify" syntax -> 0.0.3
+***********************************
+
 
 * Implement a new jack.verify() syntax that can be called *after* execution instead of jack.expect() that needs to be called *before*
 	- For objects created with jack.create();
@@ -21,17 +39,47 @@ FEATURES:
 	
 * (Details)
 	- Rename "expectations" to "preparations"
-	
-* Adapt Jack to be useable with env.js - http://ejohn.org/projects/bringing-the-browser-to-the-server
-* Integrate Jack with Screw.Unit - http://github.com/nkallen/screw-unit/tree/master
-* Find out how to handle calling of original functions
-* Text reports for argument constraints:
-	- isType()
-	- matches()
-	- hasProperty()
-	- hasProperties()
-* When reporting an expectation that was not met, report other calls to the same function.
 
+
+***********************************
+ Refactoring -> 0.0.2
+***********************************
+
+
+* Move matcing to jack.matchers.*
+	- matching functions
+		- DONE: is()
+		- DONE: isNot()
+		- DONE: isOneOf()
+		- DONE: matches()
+		- DONE: isType()
+		- DONE: hasProperty()
+		- DONE: hasProperties()
+	- display values for "actual" and "expected"
+		- DONE: is()
+		- DONE: isNot()
+		- DONE: matches()
+		- DONE: isType()
+		- DONE: hasProperty()
+		- DONE: hasProperties()
+		- DONE: isOneOf()
+		- DONE: isLessThan()
+		- DONE: isGreaterThan()
+
+* Replace expectations in FunctionGrab with instances of FunctionInvocation
+	- DONE: Implement "times"
+	- DONE: Implement mock implementations
+	- NEXT: More tests for FunctionGrab
+
+* Rename "FunctionInvocation" to something more sensible...
+    - DONE: now called FunctionSpecification
+
+
+
+***********************************
+ Alpha 0.0.1 - PLANNED
+ -> Release on boss.bekk.no
+***********************************
 
 DONE:
 
@@ -63,48 +111,3 @@ DONE:
 
 
 
-***********************************
- LATER RELEASES
-***********************************
-
-BUGFIXES:
-
-* IE reports failed expectations multiple times
-* Unable to test parts of JSSpec integration
-
-
-REFACTORING:
-
-* Split code into smaller parts with more limited responsibilities
-
-
-FEATURES: 
-
-* Integrate with qUnit: http://docs.jquery.com/QUnit
-* Integrate with jsUnit: http://jsunit.net/
-* Support grabbing deeper objects. Currently only one level.
-* Report line numbers for failed expectations (may not be possible)
-
-
-
-
-***********************************
- NOTES
-***********************************
-
-* Argument constraints
-	jack.expect("something.setSometing")
-		.whereArgument(0).is('Doh!')
-		.whereArgument(1).isNot('Maggie')
-		.whereArgument(2).isOneOf('Homer','Bart')
-		.whereArgument(3).hasProperty('fast',true)
-		.whereArgument(4).hasProperies({name:'Homer',message:'DOH!'}
-		.whereArgument(5).isType('string')
-		.whereArgument(6).matches(/d(o|u)h/)
-		.returnValue("OK")
-
-* Possible alternate syntax for expect
-	jack(function(){
-		expect(setOptions(hasProperty('host','example.com'))
-		jack.expect("setOptions").withArguments(hasProperty('host','example.com'))
-	});
