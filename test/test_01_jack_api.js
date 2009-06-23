@@ -435,9 +435,9 @@ describe('Jack API', {
 			actualReturnValues.push(mockObject.mockFunction());
 		});
 		
-		value_of(actualReturnValues.shift).should_be(expectedReturnValues[0]);
-		value_of(actualReturnValues.shift).should_be(expectedReturnValues[1]);
-		value_of(actualReturnValues.shift).should_be(expectedReturnValues[2]);
+		value_of(actualReturnValues.shift()).should_be(expectedReturnValues[0]);
+		value_of(actualReturnValues.shift()).should_be(expectedReturnValues[1]);
+		value_of(actualReturnValues.shift()).should_be(expectedReturnValues[2]);
 	}
 	,
 	'Should not have to call grab() before expect()': function() {
