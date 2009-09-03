@@ -472,10 +472,10 @@ function jack() {} // This needs to be here to make error reporting work correct
 			if(!reportingEnabled) { return; }
 			if(isScriptaculous()) {
 				throw new Error(message);
-			} else if(isJSSpec()) {
-				throw new Error(message);
 			} else if(isQunit()) {
 				ok(false, message);
+			} else if(isJSSpec()) {
+				throw new Error(message);
 			}
 		}
 	}
