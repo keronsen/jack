@@ -14,14 +14,14 @@ describe('Integration with Qunit',{
 		value_of(jack.env.isQunit()).should_be_false();
 	}
 	,
-	'Should report unmet expectations by callink ok(false, message)': function() {
+	'Should report unmet expectations by calling ok(false, message)': function() {
 		var message = {m:'not called'};
 		var called = 0;
 		window.QUnit = "";
 		window.ok = function(bool, message2) {
 			called++;
 			message.m = message2;
-		}
+		};
 		window.globalFunction = function() {};
 		jack(function(){
 				jack.expect("globalFunction").once();
