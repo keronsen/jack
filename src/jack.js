@@ -16,8 +16,8 @@ function jack() {} // This needs to be here to make error reporting work correct
 	window.jack.FunctionSpecification = FunctionSpecification;
 	window.jack.FunctionGrab = FunctionGrab;
 	return;
-	
-	
+
+
 	/**
 	 * Constructor for object that will be exposed as the global jack
 	 */
@@ -29,7 +29,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 		var currentExpectation = null;
 		var publicApi = createPublicApi();
 		return publicApi;
-		
+
 		function createPublicApi() {
 			var api = jackFunction;
 			api.grab = grab;
@@ -58,7 +58,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 		}
 		function secondPass(delegate) {
 			var oldExpect = publicApi.expect;
-			publicApi.expect = function(name) { 
+			publicApi.expect = function(name) {
 				var fakeEx = {};
 				var grab = findGrab(name);
 				if(grab._beenThroughSecondPass) {
@@ -218,8 +218,8 @@ function jack() {} // This needs to be here to make error reporting work correct
 			}
 		}
 	} // END Jack()
-	
-	
+
+
 	/**
 	 * @functionName      Name of grabbed function
 	 * @grabbedFunction   Reference to grabbed function
@@ -229,7 +229,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 		var invocations = [];
 		var specifications = [];
 		var emptyFunction = function(){};
-		
+
 		init();
 		return {
 			'times': function() { return invocations.length; },
@@ -243,7 +243,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			'arguments': getArguments,
 			'name': function() { return functionName }
 		};
-		
+
 		function init() {
 			var original = parentObject[functionName];
 			var handler = function() {
@@ -274,7 +274,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			for(var i=0; i<invocations.length; i++) {
 				var spec = findSpecificationFor(invocations[i]);
 				if(spec != null) {
-					
+
 				}
 			}
 		}
@@ -316,7 +316,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			return spec;
 		}
 		function verify() {
-			
+
 		}
 		function expect() {
 			return specify();
@@ -395,14 +395,14 @@ function jack() {} // This needs to be here to make error reporting work correct
 			return invocations[0].getArgumentValues();
 		}
 	} // END FunctionGrab()
-	
-	
+
+
 	/**
 	 *
 	 */
 	function ObjectGrab(objectName, grabbedObject) {
 		var grabs = {};
-		
+
 		init();
 		return {
 			'examine': getGrab,
@@ -411,7 +411,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			'getGrabs': function() {  return grabs },
 			'reset': reset
 		};
-		
+
 		function init() {
 			for(key in grabbedObject) {
 				var property =  grabbedObject[key];
@@ -439,8 +439,8 @@ function jack() {} // This needs to be here to make error reporting work correct
 			}
 		}
 	}
-	
-	
+
+
 	/**
 	 *
 	 */
@@ -450,13 +450,14 @@ function jack() {} // This needs to be here to make error reporting work correct
 		return {
 			'isJSSpec': isJSSpec,
 			'isScriptaculous': isScriptaculous,
+			'isQunit': isQunit,
 			'report': report,
 			'disableReporting': function() { reportingEnabled = false; },
 			'enableReporting': function() { reportingEnabled = true; },
 			'reset': function() {}
 		}
 		function init() {
-			
+
 		}
 		function isJSSpec() {
 			return window.JSSpec != null;
@@ -464,24 +465,29 @@ function jack() {} // This needs to be here to make error reporting work correct
 		function isScriptaculous() {
 			return window.Test != null && window.Test.Unit != null && window.Test.Unit.Runner != null;
 		}
+		function isQunit() {
+			return window.QUnit != null;
+		}
 		function report(message) {
 			if(!reportingEnabled) { return; }
 			if(isScriptaculous()) {
 				throw new Error(message);
+			} else if(isQunit()) {
+				ok(false, message);
 			} else if(isJSSpec()) {
 				throw new Error(message);
 			}
 		}
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	function Util() {
 		return {
 			'displayValue': displayValue
 		}
-		
+
 		function displayValue() {
 			var value = arguments[0];
 			var prefix = "";
@@ -535,19 +541,19 @@ function jack() {} // This needs to be here to make error reporting work correct
 			return '{' + keyValues.join(',') + '}';
 		}
 	}
-	
+
 	/**
 	 *
 	 */
 	function FunctionSpecification() {
 		var constraints = null;
 		var argumentValues = [];
-		var mockImplementation = null;		
+		var mockImplementation = null;
 		var timing = {actual: 0, expected: 1, modifier: 0};
-		
+
 		var api = createApi();
 		return api;
-		
+
 		function createApi() {
 			var api = {};
 			mixinMatchers(api);
@@ -574,7 +580,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 				}
 				return collected;
 			}
-			api.withArguments = function() { 
+			api.withArguments = function() {
 				for(var i=0; i<arguments.length; i++) {
 					api.whereArgument(i).is(arguments[i]);
 				}
@@ -582,7 +588,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			}
 			api.withNoArguments = function() { constraints = []; return api; }
 			return api;
-			
+
 			function addMatcher(argIndex, name, collection) {
 				collection[name] = function() {
 					addConstraint(argIndex, jack.matchers[name], arguments);
@@ -616,7 +622,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 				timing.expected = 0;
 				return api;
 			}
-			
+
 			function parseTimes(times) {
 				return parseInt(times);
 			}
@@ -760,31 +766,31 @@ function jack() {} // This needs to be here to make error reporting work correct
 			return description;
 		}
 	}
-	
-	
+
+
 	/**
 	 *
 	 */
 	function Matchers() {
 		return {
-			'is':          
-				function(a, b) { 
-					return result(a==b, a, '', b); 
+			'is':
+				function(a, b) {
+					return result(a==b, a, '', b);
 				},
-			'isNot':       
-				function(a, b) { 
-					return result(a!=b, a, 'not:', b); 
+			'isNot':
+				function(a, b) {
+					return result(a!=b, a, 'not:', b);
 				},
-			'isType': 
+			'isType':
 				function(a, b) {
 					return result(b == typeof a, a, 'type:', b);
 				},
-			'matches':     
-				function(a, b) { 
+			'matches':
+				function(a, b) {
 					return result(b.test(a), a, 'matching:', b)
 				},
-			'hasProperty': 
-				function(a, b, c) { 
+			'hasProperty':
+				function(a, b, c) {
 					var match = c ? a[b]==c : a[b]!=undefined;
 					var bDisplay = b;
 					if(c != null) {
@@ -794,7 +800,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 					return result(match, a, 'property:', bDisplay)
 				},
 			'hasProperties':
-				function(a, b) { 
+				function(a, b) {
 					var match = true;
 					for(var p in b) {
 						if(a[p] != b[p]) {
@@ -827,7 +833,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 					return result(match, a, 'oneOf:', b);
 				}
 		}
-		
+
 		function result(match, actual, prefix, expected) {
 			return {
 				result: match,
@@ -836,7 +842,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			}
 		}
 	}
-	
+
 })(); // END HIDING FROM GLOBAL SCOPE
 
 
