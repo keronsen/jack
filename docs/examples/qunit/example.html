@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+<title>Qunit example</title>
+<script type="text/javascript" src="lib/qunit.js"></script>
+<link rel="stylesheet" type="text/css" href="lib/qunit.css" />
+
+<script type="text/javascript" src="../../../src/jack.js"></script>
+<script type="text/javascript">
+	function myGlobalFunction() {
+		return "This is myGlobalFunction()";
+	}
+	test('Example of successful expectation', function() {
+	                jack(function(){
+				jack.expect("myGlobalFunction");
+				myGlobalFunction();
+			});
+        });
+
+	test('Example of failing expectation',  function() {
+			jack(function(){
+				jack.expect("myGlobalFunction");
+			});
+        });
+	
+</script>
+</head>
+<body>
+ <h1 id="qunit-header">QUnit Test Suite</h1>
+<h2 id="qunit-banner"></h2>
+<div id="qunit-testrunner-toolbar"></div>
+<h2 id="qunit-userAgent"></h2>
+<ol id="qunit-tests"></ol>
+</body>
+</html>
