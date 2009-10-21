@@ -417,6 +417,29 @@ describe('Jack API', {
 		value_of(actualReturnValue).should_be(expectedReturnValue);
 	}
 	,
+	'Should be able to specify a mock implementation that returns a series of values': function() {
+		var expectedReturnValues = [
+			"First expected return value",
+			"Second expected return value",
+			"Third expected return value" ];
+		
+		var actualReturnValues = [];
+		
+		jack(function(){
+			var mockObject = jack.create("mockObject",['mockFunction']);
+			jack.expect("mockObject.mockFunction").returnValues(
+				expectedReturnValues[0], expectedReturnValues[1], expectedReturnValues[2]);
+			
+			actualReturnValues.push(mockObject.mockFunction());
+			actualReturnValues.push(mockObject.mockFunction());
+			actualReturnValues.push(mockObject.mockFunction());
+		});
+		
+		value_of(actualReturnValues.shift()).should_be(expectedReturnValues[0]);
+		value_of(actualReturnValues.shift()).should_be(expectedReturnValues[1]);
+		value_of(actualReturnValues.shift()).should_be(expectedReturnValues[2]);
+	}
+	,
 	'Should not have to call grab() before expect()': function() {
 		window.globalFunction = function() {}
 		

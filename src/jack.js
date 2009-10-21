@@ -565,6 +565,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			api.mock = mock;
 			api.stub = stub;
 			api.returnValue = returnValue;
+			api.returnValues = returnValues;
 			api.describe = describe;
 			api.invocations = invocations;
 			api.getArgumentValues = getArgumentValues;
@@ -707,6 +708,13 @@ function jack() {} // This needs to be here to make error reporting work correct
 			mockImplementation = function() {
 				return value;
 			}
+		}
+		function returnValues() {
+			var values = [], orig = this;
+			for (var i = 0, len = arguments.length; i < len; i++) { values.push(arguments[i]); }
+			mockImplementation = function() {
+				return values.shift();
+			};
 		}
 		function hasMockImplementation() {
 			return mockImplementation != null;
