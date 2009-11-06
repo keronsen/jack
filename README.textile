@@ -90,14 +90,16 @@ bc. jack(function(){
    storeSomething();
 });
 
-h3. Creating a mock object
+h3. Creating a mock object for testing interaction
+
+If you want to test how your code under test interacts with other objects, you can create a mock object with @jack.create()@:
 
 bc. jack(function(){
-   var services = jack.create("services", ['serviceOne','serviceTwo']);
-   jack.expect("services.serviceOne")
+   var myStack = jack.create("myStack", ['push','pop']);
+   jack.expect("myStack.push")
       .exactly("1 time")
       .whereArgument(0).is("something");
-   useServices(services); 
+   useTheStack(myStack);
 });
 
 
