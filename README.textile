@@ -13,8 +13,8 @@ The head developer for Jack is "Karl-Erik Rønsen (keronsen)":http://github.com/
 
 Contributions have been received, accepted and appreciated from:
 
-- "francois2metz":http://github.com/francois2metz/jack
-- "duncanbeevers":http://github.com/duncanbeevers/jack
+* "francois2metz":http://github.com/francois2metz/jack
+* "duncanbeevers":http://github.com/duncanbeevers/jack
 
 h1. Getting started
 
@@ -28,14 +28,14 @@ h1. Test framework integration
 
 Jack is currently compatible with these JavaScript test frameworks:
 
-- "QUnit":http://docs.jquery.com/QUnit
-- "JSSpec":http://jania.pe.kr/aw/moin.cgi/JSSpec (Also used for testing Jack itself)
-- "Scriptaculous TestRunner":http://github.com/madrobby/scriptaculous/wikis/unit-testing
+* "QUnit":http://docs.jquery.com/QUnit
+* "JSSpec":http://jania.pe.kr/aw/moin.cgi/JSSpec (Also used for testing Jack itself)
+* "Scriptaculous TestRunner":http://github.com/madrobby/scriptaculous/wikis/unit-testing
 
 Integration is planned for these frameworks:
 
-- "Screw.Unit":http://github.com/nathansobo/screw-unit
-- "JsTestDriver":http://code.google.com/p/js-test-driver/
+* "Screw.Unit":http://github.com/nathansobo/screw-unit
+* "JsTestDriver":http://code.google.com/p/js-test-driver/
 
 h1. Examples
 
