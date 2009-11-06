@@ -7,11 +7,11 @@ Mocking can be achieved quite easily in JavaScript without help from a library, 
 
 h1. Getting started
 
-Download the latest version of Jack from github: http://github.com/keronsen/jack
+Download the latest version of Jack from github: "http://github.com/keronsen/jack":http://github.com/keronsen/jack
 General examples are found below.
 There are examples of use with different test frameworks in /docs/examples.
 
-If you need help, there is a google group for discussion: http://groups.google.com/group/jack-discuss
+If you need help, there is a google group for discussion: "http://groups.google.com/group/jack-discuss":http://groups.google.com/group/jack-discuss
 
 h1. Examples
 
