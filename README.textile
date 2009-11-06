@@ -5,6 +5,17 @@ h1. Introduction
 
 Mocking can be achieved quite easily in JavaScript without help from a library, but anything above verifying that a function gets called can grow hard to read. If you have experienced this (or want to avoid it in the first place), Jack is for you.
 
+h1. Contributions
+
+Contributions are very welcome. Just fork "git://github.com/keronsen/jack.git":git://github.com/keronsen/jack.git and get started.
+
+The head developer for Jack is "Karl-Erik Rønsen (keronsen)":http://github.com/keronsen/jack
+
+Contributions have been received, accepted and appreciated from:
+
+- "francois2metz":http://github.com/francois2metz/jack
+- "duncanbeevers":http://github.com/duncanbeevers/jack
+
 h1. Getting started
 
 Download the latest version of Jack from github: "http://github.com/keronsen/jack":http://github.com/keronsen/jack
@@ -12,6 +23,19 @@ General examples are found below.
 There are examples of use with different test frameworks in /docs/examples.
 
 If you need help, there is a google group for discussion: "http://groups.google.com/group/jack-discuss":http://groups.google.com/group/jack-discuss
+
+h1. Test framework integration
+
+Jack is currently compatible with these JavaScript test frameworks:
+
+- "QUnit":http://docs.jquery.com/QUnit
+- "JSSpec":http://jania.pe.kr/aw/moin.cgi/JSSpec (Also used for testing Jack itself)
+- "Scriptaculous TestRunner":http://github.com/madrobby/scriptaculous/wikis/unit-testing
+
+Integration is planned for these frameworks:
+
+- "Screw.Unit":http://github.com/nathansobo/screw-unit
+- "JsTestDriver":http://code.google.com/p/js-test-driver/
 
 h1. Examples
 
