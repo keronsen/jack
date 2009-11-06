@@ -462,6 +462,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			'isJSSpec': isJSSpec,
 			'isScriptaculous': isScriptaculous,
 			'isQunit': isQunit,
+			'isJsTestDriver': isJsTestDriver,
 			'report': report,
 			'disableReporting': function() { reportingEnabled = false; },
 			'enableReporting': function() { reportingEnabled = true; },
@@ -479,9 +480,14 @@ function jack() {} // This needs to be here to make error reporting work correct
 		function isQunit() {
 			return window.QUnit != null;
 		}
+		function isJsTestDriver() {
+			return window.jstestdriver != null;
+		}
 		function report(message) {
 			if(!reportingEnabled) { return; }
-			if(isScriptaculous()) {
+			if(isJsTestDriver()) {
+				fail(message);
+			} else if(isScriptaculous()) {
 				throw new Error(message);
 			} else if(isQunit()) {
 				ok(false, message);

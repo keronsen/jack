@@ -1,0 +1,114 @@
+
+h1. Introduction
+
+*Jack* is a toolkit for mocking JavaScript objects and functions when writing tests. It is inspired by similar projects for Java and C#, like "JMock":http://www.jmock.org/, "Mockito":http://mockito.org/ and "Rhino Mocks":http://www.ayende.com/projects/rhino-mocks.aspx
+
+Mocking can be achieved quite easily in JavaScript without help from a library, but anything above verifying that a function gets called can grow hard to read. If you have experienced this (or want to avoid it in the first place), Jack is for you.
+
+h1. Contributions
+
+Contributions are very welcome. Just fork "git://github.com/keronsen/jack.git":git://github.com/keronsen/jack.git and get started.
+
+The head developer for Jack is "Karl-Erik Rønsen (keronsen)":http://github.com/keronsen/jack
+
+Contributions have been received, accepted and appreciated from:
+
+* "francois2metz":http://github.com/francois2metz/jack
+* "duncanbeevers":http://github.com/duncanbeevers/jack
+
+h1. Getting started
+
+Download the latest version of Jack from github: "http://github.com/keronsen/jack":http://github.com/keronsen/jack
+General examples are found below.
+There are examples of use with different test frameworks in /docs/examples.
+
+If you need help, there is a google group for discussion: "http://groups.google.com/group/jack-discuss":http://groups.google.com/group/jack-discuss
+
+h1. Test framework integration
+
+Jack is currently compatible with these JavaScript test frameworks:
+
+* "JsTestDriver":http://code.google.com/p/js-test-driver/
+* "QUnit":http://docs.jquery.com/QUnit
+* "JSSpec":http://jania.pe.kr/aw/moin.cgi/JSSpec (Also used for testing Jack itself)
+* "Scriptaculous TestRunner":http://github.com/madrobby/scriptaculous/wikis/unit-testing
+
+Integration is planned for these frameworks:
+
+* "YUI Test":http://developer.yahoo.com/yui/yuitest/
+* "Screw.Unit":http://github.com/nathansobo/screw-unit
+
+h1. Examples
+
+For these examples, the application under test has a function storeSomething() that we expect will call the jQuery.post() function.
+
+h3. Expect one call to function
+
+bc. jack(function(){
+   jack.expect("jQuery.post").exactly("1 time");
+   storeSomething();
+});
+
+Available call quantifiers: never(), once(), exactly(), atLeast(), atMost()
+
+h3. Expect argument values
+
+bc. jack(function(){
+   jack.expect("jQuery.post")
+      .exactly("1 time")
+      .withArguments("http://example.com/service");
+   storeSomething();
+});
+
+h3. Set other argument constraints
+
+bc. jack(function(){
+   jack.expect("jQuery.post")
+      .exactly("1 time")
+      .whereArgument(0).isOneOf("/serviceOne","/serviceTwo");
+   storeSomething();
+});
+
+Available constraint methods: is(), isNot(), isOneOf(), isType(), matches(), hasProperty(), hasProperties()
+
+h3. Specifying a mock implementation of a function
+
+bc. jack(function(){
+   jack.expect("jQuery.post")
+      .exactly("1 time")
+      .mock(function() {
+          // your mock implementation
+      });
+   storeSomething();
+});
+
+h3. Specifying a return value
+
+bc. jack(function(){
+   jack.expect("jQuery.post")
+      .exactly("1 time")
+      .returnValue("The value to return.");
+   storeSomething();
+});
+
+h3. Creating a mock object for testing interaction
+
+If you want to test how your code under test interacts with other objects, you can create a mock object with @jack.create()@:
+
+bc. jack(function(){
+   var myStack = jack.create("myStack", ['push','pop']);
+   jack.expect("myStack.push")
+      .exactly("1 time")
+      .whereArgument(0).is("something");
+   useTheStack(myStack);
+});
+
+
+
+
+
+
+
+
+
+
