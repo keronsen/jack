@@ -9,7 +9,7 @@ h1. Examples
 
 For these examples, the application under test has a function storeSomething() that we expect will call the jQuery.post() function.
 
-h3.Expect one call to function
+h3. Expect one call to function
 
 bc. jack(function(){
    jack.expect("jQuery.post").exactly("1 time");
@@ -24,7 +24,6 @@ bc. jack(function(){
    jack.expect("jQuery.post")
       .exactly("1 time")
       .withArguments("http://example.com/service");
-
    storeSomething();
 });
 
@@ -34,7 +33,6 @@ bc. jack(function(){
    jack.expect("jQuery.post")
       .exactly("1 time")
       .whereArgument(0).isOneOf("/serviceOne","/serviceTwo");
-
    storeSomething();
 });
 
@@ -48,7 +46,6 @@ bc. jack(function(){
       .mock(function() {
           // your mock implementation
       });
-
    storeSomething();
 });
 
@@ -58,7 +55,6 @@ bc. jack(function(){
    jack.expect("jQuery.post")
       .exactly("1 time")
       .returnValue("The value to return.");
-
    storeSomething();
 });
 
@@ -66,11 +62,9 @@ h3. Creating a mock object
 
 bc. jack(function(){
    var services = jack.create("services", ['serviceOne','serviceTwo']);
-
    jack.expect("services.serviceOne")
       .exactly("1 time")
       .whereArgument(0).is("something");
-
    useServices(services); 
 });
 
