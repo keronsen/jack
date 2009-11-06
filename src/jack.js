@@ -174,15 +174,13 @@ function jack() {} // This needs to be here to make error reporting work correct
 			if(findGrab(name) == null) {
 				grab(name);
 			}
-			currentExpectation = findGrab(name).expect().once();
-			return currentExpectation;
+			return findGrab(name).expect().once();
 		}
 		function verify(name) {
 			if(findGrab(name) == null) {
 				grab(name);
 			}
-			currentExpectation = findGrab(name).expect().once();
-			return currentExpectation;
+			return findGrab(name).verify();
 		}
 		function report(name, expectation) {
 			return findGrab(name).report(expectation, name);
@@ -235,6 +233,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			'times': function() { return invocations.length; },
 			'reset': reset,
 			'expect': expect,
+			'verify': verify,
 			'specify': specify,
 			'report': report,
 			'reportAll': reportAll,
@@ -316,7 +315,9 @@ function jack() {} // This needs to be here to make error reporting work correct
 			return spec;
 		}
 		function verify() {
-
+			var specification = specify();
+			copyInvocationsToSpecification(invocations, specification);
+			return specification;
 		}
 		function expect() {
 			return specify();
@@ -347,12 +348,11 @@ function jack() {} // This needs to be here to make error reporting work correct
 		function report(specification, fullName) {
 			if(specification == null) {
 				if(specifications.length == 0) {
-					var spec = specify().never();
-					for(var i=0; i<invocations.length; i++) {
-						spec.invoke();
-					}
+					var specification = specify().never();
+					copyInvocationsToSpecification(invocations, specification);
+				} else {
+					specification = specifications[0];
 				}
-				specification = specifications[0];
 			}
 			var report = {};
 			report.expected = specification.invocations().expected;
@@ -363,6 +363,11 @@ function jack() {} // This needs to be here to make error reporting work correct
 				report.message = "Expectation failed: " + specification.describe(fullName);
 			}
 			return report;
+		}
+		function copyInvocationsToSpecification(invocations, specification) {
+			for(var i=0; i<invocations.length; i++) {
+				specification.invoke();
+			}
 		}
 		function generateReportMessage(report, fullName, argumentsDisplay) {
 			return report.messageParts.template
