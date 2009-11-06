@@ -3,7 +3,15 @@ h1. Introduction
 
 *Jack* is a toolkit for mocking JavaScript objects and functions when writing tests. It is inspired by similar projects for Java and C#, like "JMock":http://www.jmock.org/, "Mockito":http://mockito.org/ and "Rhino Mocks":http://www.ayende.com/projects/rhino-mocks.aspx
 
-Mocking can be achieved quite easily in JavaScript without help from a library, but anything above verifying that a function gets called can grow hard to read. Jack is intended to be fun to use and easy to read.
+Mocking can be achieved quite easily in JavaScript without help from a library, but anything above verifying that a function gets called can grow hard to read. If you have experienced this (or want to avoid it in the first place), Jack is for you.
+
+h1. Getting started
+
+Download the latest version of Jack from github: http://github.com/keronsen/jack
+General examples are found below.
+There are examples of use with different test frameworks in /docs/examples.
+
+If you need help, there is a google group for discussion: http://groups.google.com/group/jack-discuss
 
 h1. Examples
 
@@ -36,9 +44,9 @@ bc. jack(function(){
    storeSomething();
 });
 
-h3. Available constraint methods: is(), isNot(), isOneOf(), isType(), matches(), hasProperty(), hasProperties()
+Available constraint methods: is(), isNot(), isOneOf(), isType(), matches(), hasProperty(), hasProperties()
 
-Specifying a mock implementation of a function
+h3. Specifying a mock implementation of a function
 
 bc. jack(function(){
    jack.expect("jQuery.post")
