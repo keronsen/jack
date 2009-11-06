@@ -1,13 +1,13 @@
 
 SucceedingTest = TestCase("SucceedingTest");
 
-SucceedingTest.prototype.expectedFunctionIsCalled = function() {
+SucceedingTest.prototype.testExpectedFunctionIsCalled = function() {
 	jack(function(){
 		
 	});
 };
 
-SucceedingTest.prototype.expectedFunctionIsCalledOnObject = function() {
+SucceedingTest.prototype.testExpectedFunctionIsCalledOnObject = function() {
 	jack(function(){
 		
 	});
