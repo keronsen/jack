@@ -1,14 +1,14 @@
 
 FailingTest = TestCase("Examples that should fail");
 
-FailingTest.prototype.testExpectedFunctionIsCalled = function() {
+FailingTest.prototype.testExpectedFunctionIsNotCalled = function() {
 	jack(function(){
-		
+		jack.expect("myGlobalFunction");
 	});
 };
 
-FailingTest.prototype.testExpectedFunctionIsCalledOnObject = function() {
+FailingTest.prototype.testExpectedFunctionIsNotCalledOnObject = function() {
 	jack(function(){
-		
+		jack.expect("myGlobalObject.functionOne");
 	});
 };
