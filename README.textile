@@ -35,6 +35,7 @@ Jack is currently compatible with these JavaScript test frameworks:
 
 Integration is planned for these frameworks:
 
+* "YUI Test":http://developer.yahoo.com/yui/yuitest/
 * "Screw.Unit":http://github.com/nathansobo/screw-unit
 
 h1. Examples
