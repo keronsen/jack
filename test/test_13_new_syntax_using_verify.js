@@ -40,95 +40,34 @@ describe('Using verify() instead of expect() for objects created with jack.creat
 		value_of(report.actual).should_be(1);
 		value_of(report.success).should_be_false();
 	}
-	
+	,
+	'Should verify multiple calls with separate argument sets': function() {
+		jack(function() {
+			var myStack = jack.create("myStack", ["push","pop"]);
+			myStack.push("First element");
+			myStack.push("Second element");
+			myStack.push("Second element");
+			jack.verify("myStack.push").exactly("1 time").whereArgument(0).is("First element");
+			jack.verify("myStack.push").exactly("2 times").whereArgument(0).is("Second element");
+		});
+		
+		var report = jack.report("myStack.push");
+		value_of(report.success).should_be_true();
+	}
+	,
+	'Should verify mismatch in multiple calls with separate argument sets': function() {
+		jack(function() {
+			var myStack = jack.create("myStack", ["push","pop"]);
+			myStack.push("First element");
+			myStack.push("Second element");
+			myStack.push("Second element");
+			jack.verify("myStack.push").exactly("1 time").whereArgument(0).is("First element");
+			jack.verify("myStack.push").exactly("1 times").whereArgument(0).is("Second element");
+		});
+		
+		var report = jack.report("myStack.push");
+		value_of(report.success).should_be_true();
+	}
 	
 
 });
-
-
-/*
-
-,
-'Should be able to specify a minimum number of expected calls (Example 2)': function() {
-	window.globalFunction = function() {}
-	
-	jack(function(){
-		jack.expect("globalFunction").atLeast("3 times");
-		window.globalFunction();
-		window.globalFunction();
-		window.globalFunction();
-	});
-	
-	var report = jack.report("globalFunction");
-	value_of(report.expected).should_be(3);
-	value_of(report.success).should_be_true();
-	
-	window.globalFunction = null;
-}
-,
-'Should be able to specify a minimum number of expected calls (Example 3)': function() {
-	window.globalFunction = function() {}
-	
-	jack(function(){
-		jack.expect("globalFunction").atLeast("3 times");
-		window.globalFunction();
-	});
-	
-	var report = jack.report("globalFunction");
-	value_of(report.expected).should_be(3);
-	value_of(report.success).should_be_false();
-	
-	window.globalFunction = null;
-}
-,
-'Should be able to specify a maximum number of expected calls (Example 1)': function() {
-	window.globalFunction = function() {}
-	
-	jack(function(){
-		jack.expect("globalFunction").atMost("3 times");
-		window.globalFunction();
-		window.globalFunction();
-		window.globalFunction();
-		window.globalFunction();
-	});
-	
-	var report = jack.report("globalFunction");
-	value_of(report.expected).should_be(3);
-	value_of(report.success).should_be_false();
-	
-	window.globalFunction = null;
-}
-,
-'Should be able to specify a maximum number of expected calls (Example 2)': function() {
-	window.globalFunction = function() {}
-	
-	jack(function(){
-		jack.expect("globalFunction").atMost("3 times");
-		window.globalFunction();
-		window.globalFunction();
-		window.globalFunction();
-	});
-	
-	var report = jack.report("globalFunction");
-	value_of(report.expected).should_be(3);
-	value_of(report.success).should_be_true();
-	
-	window.globalFunction = null;
-}
-,
-'Should be able to specify a maximum number of expected calls (Example 3)': function() {
-	window.globalFunction = function() {}
-	
-	jack(function(){
-		jack.expect("globalFunction").atMost("3 times");
-		window.globalFunction();
-		window.globalFunction();
-	});
-	
-	var report = jack.report("globalFunction");
-	value_of(report.expected).should_be(3);
-	value_of(report.success).should_be_true();
-	
-	window.globalFunction = null;
-}
-*/

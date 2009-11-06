@@ -255,6 +255,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 		}
 		function handleInvocation() {
 			var invocation = new FunctionSpecification();
+			invocation.isMatchedToSpecification = false;
 			for(var i=0; i<arguments.length; i++) {
 				invocation.whereArgument(i).is(arguments[i]);
 			}
@@ -263,17 +264,23 @@ function jack() {} // This needs to be here to make error reporting work correct
 			if(specification == null) {
 				return grabbedFunction.apply(this, arguments);
 			} else if(specification.hasMockImplementation()) {
+				invocation.isMatchedToSpecification = true;
 				return specification.invoke.apply(this, arguments);
 			} else {
+				invocation.isMatchedToSpecification = true;
 				specification.invoke.apply(this, arguments);
 				return grabbedFunction.apply(this, arguments);
 			}
 		}
 		function matchInvocationsToSpecifications() {
 			for(var i=0; i<invocations.length; i++) {
-				var spec = findSpecificationFor(invocations[i]);
-				if(spec != null) {
-
+				var invocation = invocations[i];
+				if(!invocation.isMatchedToSpecification) {
+					var spec = findSpecificationFor(invocation);
+					if(spec != null) {
+						invocation.isMatchedToSpecification = true;
+						spec.invoke();
+					}
 				}
 			}
 		}
@@ -315,9 +322,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			return spec;
 		}
 		function verify() {
-			var specification = specify();
-			copyInvocationsToSpecification(invocations, specification);
-			return specification;
+			return specify();
 		}
 		function expect() {
 			return specify();
@@ -339,6 +344,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			return result;
 		}
 		function reportAll(fullName) {
+			matchInvocationsToSpecifications();
 			var reports = [];
 			for(var i=0; i<specifications.length; i++) {
 				reports.push(report(specifications[i], fullName));

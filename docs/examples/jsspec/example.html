@@ -38,6 +38,14 @@
 				myGlobalObject.functionOne();
 			});
 		}
+		,
+		'Verifying a call at end of test': function() {
+			jack(function(){
+				var myMock = jack.create("myMock", ["myFunction"]);
+				myMock.myFunction();
+				jack.verify("myMock.myFunction");
+			});
+		}
 	});
 
 	describe('Examples of failing expectations', {
@@ -76,6 +84,13 @@
 					.whereArgument(1).is(true)
 					.whereArgument(2).isNot("bar")
 					.whereArgument(3).isOneOf("one","or","the","other");
+			});
+		}
+		,
+		'Verifyied function was never called': function() {
+			jack(function(){
+				var myMock = jack.create("myMock", ["myFunction"]);
+				jack.verify("myMock.myFunction");
 			});
 		}
 	});
