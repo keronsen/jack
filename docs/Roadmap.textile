@@ -1,0 +1,34 @@
+
+h1. Road map
+
+h2. Goals
+
+# Jack should be the best mocking tool for JavaScript TDD
+# Jack code should be easy to read and easy to write
+
+h2. How to get there
+
+# Be compatible with all major JavaScript testing frameworks
+# Simple mocking tasks should require short code
+# Complex mocking tasks should be supported without making simple tasks harder
+
+h2. Planned features
+
+(Current version is 0.0.2)
+
+h3. Version 0.0.3
+
+* Compatibility with "YUI Test":http://developer.yahoo.com/yui/yuitest/
+* Support for @jack.verify()@ and @jack.when()@ syntax to split setup code and assertion code.
+
+h3. Version 0.0.4
+
+?
+
+h2. Ideas
+
+* Syntax for making a stub throw an exception (Error)
+* Compatibility with "env.js":http://ejohn.org/blog/bringing-the-browser-to-the-server/
+* Report file name and line number for failures
+
+
