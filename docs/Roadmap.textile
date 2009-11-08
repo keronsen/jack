@@ -27,7 +27,8 @@ h3. Version 0.0.4
 
 h2. Ideas
 
-* Syntax for making a stub throw an exception (Error)
+* Support for making a stub throw an exception (Error)
+* Verify the order of function calls
 * Compatibility with "env.js":http://ejohn.org/blog/bringing-the-browser-to-the-server/
 * Report file name and line number for failures
 
