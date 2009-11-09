@@ -37,6 +37,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			api.inspect = inspect;
 			api.expect = expect;
 			api.verify = verify;
+			api.when = when;
 			api.report = report;
 			api.reportAll = reportAll;
 			api.env = environment;
@@ -182,6 +183,12 @@ function jack() {} // This needs to be here to make error reporting work correct
 			}
 			return findGrab(name).verify();
 		}
+		function when(name) {
+			if(findGrab(name) == null) {
+				grab(name);
+			}
+			return findGrab(name).when();
+		}
 		function report(name, expectation) {
 			return findGrab(name).report(expectation, name);
 		}
@@ -226,6 +233,8 @@ function jack() {} // This needs to be here to make error reporting work correct
 	function FunctionGrab(functionName, grabbedFunction, parentObject) {
 		var invocations = [];
 		var specifications = [];
+		var verifications = [];
+		var reports = null;
 		var emptyFunction = function(){};
 
 		init();
@@ -233,6 +242,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			'times': function() { return invocations.length; },
 			'reset': reset,
 			'expect': expect,
+			'when': when,
 			'verify': verify,
 			'specify': specify,
 			'report': report,
@@ -256,11 +266,12 @@ function jack() {} // This needs to be here to make error reporting work correct
 		function handleInvocation() {
 			var invocation = new FunctionSpecification();
 			invocation.isMatchedToSpecification = false;
+			invocation.isMatchedToVerification = false;
 			for(var i=0; i<arguments.length; i++) {
 				invocation.whereArgument(i).is(arguments[i]);
 			}
 			invocations.push(invocation);
-			var specification = findSpecificationFor(invocation);
+			var specification = findSpecificationsFor(invocation)[0];
 			if(specification == null) {
 				return grabbedFunction.apply(this, arguments);
 			} else if(specification.hasMockImplementation()) {
@@ -276,22 +287,45 @@ function jack() {} // This needs to be here to make error reporting work correct
 			for(var i=0; i<invocations.length; i++) {
 				var invocation = invocations[i];
 				if(!invocation.isMatchedToSpecification) {
-					var spec = findSpecificationFor(invocation);
-					if(spec != null) {
+					var specifications = findSpecificationsFor(invocation);
+					for(var j = 0; j < specifications.length; j++) {
 						invocation.isMatchedToSpecification = true;
-						spec.invoke();
+						specifications[j].invoke();
 					}
 				}
 			}
 		}
-		function findSpecificationFor(invocation) {
+		function matchInvocationsToVerifications() {
+			for(var i=0; i<invocations.length; i++) {
+				var invocation = invocations[i];
+				if(!invocations.isMatchedToVerification) {
+					var verifications = findVerificationsFor(invocation);
+					for(var j = 0; j < verifications.length; j++) {
+						invocation.isMatchedToVerification = true;
+						verifications[j].invoke();
+					}
+				}
+			}
+		}
+		function findSpecificationsFor(invocation) {
+			var matched = [];
 			for(var i=0; i<specifications.length; i++) {
 				var specification = specifications[i];
 				if(invocation.satisfies(specification)) {
-					return specification;
+					matched.push(specification);
 				}
 			}
-			return null;
+			return matched;
+		}
+		function findVerificationsFor(invocation) {
+			var matched = [];
+			for(var i=0; i<verifications.length; i++) {
+				var verification = verifications[i];
+				if(invocation.satisfies(verification)) {
+					matched.push(verification);
+				}
+			}
+			return matched;
 		}
 		function isArgumentContstraintsMatching(invocation, expectation) {
 			var constr = expectation._argumentConstraints;
@@ -321,8 +355,14 @@ function jack() {} // This needs to be here to make error reporting work correct
 			specifications.push(spec);
 			return spec;
 		}
+		function when() {
+			return specify().any();
+		}
 		function verify() {
-			return specify();
+			var spec = new FunctionSpecification();
+			spec._id = verifications.length;
+			verifications.push(spec);
+			return spec;
 		}
 		function expect() {
 			return specify();
@@ -344,21 +384,22 @@ function jack() {} // This needs to be here to make error reporting work correct
 			return result;
 		}
 		function reportAll(fullName) {
-			matchInvocationsToSpecifications();
-			var reports = [];
-			for(var i=0; i<specifications.length; i++) {
-				reports.push(report(specifications[i], fullName));
+			if(reports == null) {
+				matchInvocationsToSpecifications();
+				matchInvocationsToVerifications();
+				reports = [];
+				for(var i=0; i<specifications.length; i++) {
+					reports.push(report(specifications[i], fullName));
+				}
+				for(var i=0; i<verifications.length; i++) {
+					reports.push(report(verifications[i], fullName));
+				}
 			}
 			return reports;
 		}
 		function report(specification, fullName) {
 			if(specification == null) {
-				if(specifications.length == 0) {
-					var specification = specify().never();
-					copyInvocationsToSpecification(invocations, specification);
-				} else {
-					specification = specifications[0];
-				}
+				specification = getFirstSpecificationOrVerification();
 			}
 			var report = {};
 			report.expected = specification.invocations().expected;
@@ -370,10 +411,20 @@ function jack() {} // This needs to be here to make error reporting work correct
 			}
 			return report;
 		}
-		function copyInvocationsToSpecification(invocations, specification) {
-			for(var i=0; i<invocations.length; i++) {
-				specification.invoke();
+		function getFirstSpecificationOrVerification() {
+			var result = null;
+			if(verifications.length > 0) {
+				result = verifications[0];
+			} else if(specifications.length > 0) {
+				result = specifications[0];
+			} else {
+				var specification = specify().never();
+				for(var i=0; i<invocations.length; i++) {
+					specification.invoke();
+				}
+				result = specification;
 			}
+			return result
 		}
 		function generateReportMessage(report, fullName, argumentsDisplay) {
 			return report.messageParts.template
@@ -637,6 +688,11 @@ function jack() {} // This needs to be here to make error reporting work correct
 			}
 			api.never = function() {
 				timing.expected = 0;
+				return api;
+			}
+			api.any = function() {
+				timing.expected = 0;
+				timing.modifier = 1;
 				return api;
 			}
 

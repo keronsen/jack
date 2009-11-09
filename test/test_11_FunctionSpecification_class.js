@@ -226,6 +226,14 @@ describe('FunctionSpecification class', {
 		value_of(spec.testTimes(2)).should_be_false();
 	}
 	,
+	'Should ignore number of calls with any()': function() {
+		var spec = new jack.FunctionSpecification();
+		spec.any();
+		value_of(spec.invocations().expected).should_be(0);
+		value_of(spec.testTimes(0)).should_be_true();
+		value_of(spec.testTimes(Number.MAX_VALUE)).should_be_true();
+	}
+	,
 	'Should describe itself': function() {
 		var spec = new jack.FunctionSpecification();
 		value_of(spec.describe("foo")).should_match("foo\(\)");
