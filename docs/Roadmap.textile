@@ -34,6 +34,8 @@ h2. Ideas
 * Integration with "JsUnit":http://www.jsunit.net/
 * Verify the order of function calls
 * Compatibility with "env.js":http://ejohn.org/blog/bringing-the-browser-to-the-server/
+* When reporting an expectation that was not met, report other calls to the same function.
 * Report file name and line number for failures
+* Refactor to reusable parts
 
 
