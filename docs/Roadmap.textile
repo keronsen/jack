@@ -28,6 +28,7 @@ h3. Version 0.0.4
 h2. Ideas
 
 * Support for making a stub throw an exception (Error)
+* Export functions to global namespace to avoid the need to write "jack." so often: expect(), create(), when(), verify()
 * Verify the order of function calls
 * Compatibility with "env.js":http://ejohn.org/blog/bringing-the-browser-to-the-server/
 * Report file name and line number for failures
