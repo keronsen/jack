@@ -479,7 +479,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 		}
 		function report(message) {
 			if(!reportingEnabled) { return; }
-			if(isYuiTest()) {
+			if(isYuiTest()) {
 				YAHOO.util.Assert.fail(message);
 			} else if(isJsTestDriver()) {
 				fail(message);
