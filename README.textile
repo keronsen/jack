@@ -30,12 +30,12 @@ Jack is currently compatible with these JavaScript test frameworks:
 
 * "JsTestDriver":http://code.google.com/p/js-test-driver/
 * "QUnit":http://docs.jquery.com/QUnit
+* "YUI Test":http://developer.yahoo.com/yui/yuitest/
 * "JSSpec":http://jania.pe.kr/aw/moin.cgi/JSSpec (Also used for testing Jack itself)
 * "Scriptaculous TestRunner":http://github.com/madrobby/scriptaculous/wikis/unit-testing
 
 Integration is planned for these frameworks:
 
-* "YUI Test":http://developer.yahoo.com/yui/yuitest/
 * "Screw.Unit":http://github.com/nathansobo/screw-unit
 
 h1. Examples
