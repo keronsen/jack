@@ -452,6 +452,7 @@ function jack() {} // This needs to be here to make error reporting work correct
 			'isScriptaculous': isScriptaculous,
 			'isQunit': isQunit,
 			'isJsTestDriver': isJsTestDriver,
+			'isYuiTest': isYuiTest,
 			'report': report,
 			'disableReporting': function() { reportingEnabled = false; },
 			'enableReporting': function() { reportingEnabled = true; },
@@ -472,9 +473,15 @@ function jack() {} // This needs to be here to make error reporting work correct
 		function isJsTestDriver() {
 			return window.jstestdriver != null;
 		}
+		function isYuiTest() {
+			var y = window.YAHOO;
+			return y != null && y.tool != null && y.tool.TestCase != null;
+		}
 		function report(message) {
 			if(!reportingEnabled) { return; }
-			if(isJsTestDriver()) {
+			if(isYuiTest()) {
+				YAHOO.util.Assert.fail(message);
+			} else if(isJsTestDriver()) {
 				fail(message);
 			} else if(isScriptaculous()) {
 				throw new Error(message);
